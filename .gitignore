@@ -3,9 +3,11 @@
 ##
 ## Get latest from https://github.com/github/gitignore/blob/main/VisualStudio.gitignore
 
+.gitignore
+
 ## wwwroot
 wwwroot/**
-\src\CloudAccounting.UI\wwwroot
+src/CloudAccounting.UI/wwwroot
 wwwroot/Lib/
 wwwroot/Lib/**
 wwwroot/css/
