@@ -3,6 +3,20 @@
 ##
 ## Get latest from https://github.com/github/gitignore/blob/main/VisualStudio.gitignore
 
+## wwwroot
+wwwroot/**
+\src\CloudAccounting.UI\wwwroot
+wwwroot/Lib/
+wwwroot/Lib/**
+wwwroot/css/
+wwwroot/css/** 
+wwwroot/js/
+wwwroot/js/**
+wwwroot/dist/
+wwwroot/dist/**
+wwwroot/vendor/
+wwwroot/vendor/**
+# Uncomment if you have tasks that rely on the files in wwwroot
 # User-specific files
 *.rsuser
 *.suo
