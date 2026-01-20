@@ -1,11 +1,6 @@
 <Solution>
-  <Configurations>
-    <Platform Name="Any CPU" />
-    <Platform Name="x64" />
-    <Platform Name="x86" />
-  </Configurations>
   
   <Folder Name="/src/">
-    <Project Path="src/CloudAccounting.UI/CloudAccounting.UI.csproj" />
+    <Project Path="CloudAccounting.Wasm/CloudAccounting.Wasm.csproj" Id="e31f8cb2-eb16-4ea7-b0b8-f1d9fc17bb33" />
   </Folder>
 </Solution>
