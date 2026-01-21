@@ -7,10 +7,14 @@ using CloudAccounting.Wasm.Utilities;
 
 namespace CloudAccounting.Wasm.Services.Repositories.Company
 {
-    public class CompanyService(IHttpClientFactory factory) : ICompanyService
+    public class CompanyService
+    (
+        IHttpClientFactory factory, 
+        ILogger<CompanyService> logger
+    ) : ICompanyService
     {
         private readonly HttpClient _httpClient = factory.CreateClient("CloudAccountingApi");
-        private readonly ILogger<CompanyService>? _logger;
+        private readonly ILogger<CompanyService>? _logger = logger;
         private const string relativePath = "/api/v1/companies";
 
         public async Task<Result<CompanyDetail>> GetCompanyByIdAsync(int companyCode)
