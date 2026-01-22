@@ -1,11 +1,4 @@
-﻿using CloudAccounting.Wasm.Models;
-using CloudAccounting.Wasm.Models.Company;
-using Microsoft.AspNetCore.WebUtilities;
-using System.Net.Http.Json;
-using System.Text.Json;
-using CloudAccounting.Wasm.Utilities;
-
-namespace CloudAccounting.Wasm.Services.Repositories.Company
+﻿namespace CloudAccounting.Wasm.Services.Repositories.Company
 {
     public class CompanyService
     (
