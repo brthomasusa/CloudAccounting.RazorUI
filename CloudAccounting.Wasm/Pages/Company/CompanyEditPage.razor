@@ -1,5 +1,87 @@
-﻿@page "/Pages/Company/CompanyEditPage/{companyCode}"
+﻿@page "/Pages/Company/CompanyEditPage/{CompanyCode:int}"
+@using CloudAccounting.Wasm.Components
+@using Radzen
 
 <PageTitle>Edit Company</PageTitle>
 
-<RadzenText TextStyle="TextStyle.Subtitle1">Edit Company</RadzenText>
+<RadzenText TextStyle="TextStyle.Subtitle1">Editing Company: @_companyName</RadzenText>
+
+<ErrorBoundary>
+    <ChildContent>
+        @if (_company == null)
+        {
+            <LoadingIndicator />
+        }
+        else
+        {
+            <RadzenTemplateForm @ref="_companyDetailForm" Data="@_company" Submit="@((CompanyDetail args) => { Submit(args); })">
+                <RadzenRow Gap="2rem" class="rz-p-0 rz-p-lg-4">
+                    <RadzenColumn Size="12" SizeMD="8">
+                        <RadzenStack Gap="1rem">
+                            <RadzenStack Orientation="Orientation.Vertical" Gap="0.5rem">
+                                <RadzenLabel Component="companyNameInput">
+                                    Company Name <span style="color: var(--rz-danger);">*</span>
+                                </RadzenLabel>
+                                    
+                                <RadzenTextBox Name="companyNameInput" @bind-Value=@_company.CompanyName Placeholder="Enter company name" />
+                                <RadzenRequiredValidator Component="companyNameInput" Text="Missing company name" Popup="true" Style="position: absolute" />
+                                <RadzenLengthValidator Component="companyNameInput" Max="100" Text="Company name should be at most 100 characters" Popup=true Style="position: absolute" />
+                            </RadzenStack>
+
+                            <RadzenStack Orientation="Orientation.Vertical" Gap="0.5rem">
+                                <RadzenLabel Component="addressInput">
+                                    Address <span style="color: var(--rz-danger);">*</span>
+                                </RadzenLabel>
+                                <small style="display: block">(example: 1234 Main St, Ste 100)</small>
+                                <RadzenTextArea Name="addressInput" @bind-Value=@_company.Address Placeholder="Enter company address" />
+                            </RadzenStack>
+
+                            <RadzenStack Orientation="Orientation.Vertical" Gap="0.5rem">
+                                <RadzenLabel Component="cityInput">
+                                    City <span style="color: var(--rz-danger);">*</span>
+                                </RadzenLabel>
+                                <RadzenTextBox Name="cityInput" @bind-Value=@_company.City Placeholder="Enter city name" />
+                            </RadzenStack>
+
+                            <RadzenStack Orientation="Orientation.Vertical" Gap="0.5rem">
+                                <RadzenLabel Component="zipcodeInput">
+                                    Zipcode <span style="color: var(--rz-danger);">*</span>
+                                </RadzenLabel>
+                                <RadzenTextArea Name="zipcodeInput" @bind-Value=@_company.Zipcode Placeholder="Enter zipcode" />
+                            </RadzenStack>
+
+                            <RadzenStack Orientation="Orientation.Vertical" Gap="0.5rem">
+                                <RadzenLabel Component="telephoneInput">
+                                    Telephone <span style="color: var(--rz-danger);">*</span>
+                                </RadzenLabel>
+                                <RadzenTextBox Name="telephoneInput" @bind-Value=@_company.Phone Placeholder="Enter telephone number" />
+                            </RadzenStack>
+
+                            <RadzenStack Orientation="Orientation.Vertical" Gap="0.5rem">
+                                <RadzenLabel Component="faxInput">
+                                    Fax <span style="color: var(--rz-danger);">*</span>
+                                </RadzenLabel>
+                                <RadzenTextArea Name="faxInput" @bind-Value=@_company.Fax Placeholder="Enter fax number" />
+                            </RadzenStack>
+
+                            <RadzenStack Orientation="Orientation.Vertical" Gap="0.5rem">
+                                <RadzenLabel Component="currencyInput">
+                                    Currency <span style="color: var(--rz-danger);">*</span>
+                                </RadzenLabel>
+                                <RadzenDropDown Name="currencyInput" @bind-Value=@_company.Currency Data=@_currencies Style="width: 100%;" />
+                            </RadzenStack>
+                        </RadzenStack>
+                    </RadzenColumn>
+                </RadzenRow>
+                <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.Center" Gap="1rem" class="rz-mt-8 rz-mb-4">
+                    <RadzenButton ButtonStyle="ButtonStyle.Light" Variant="Variant.Flat" Size="ButtonSize.Large" Icon="cancel" Text="Cancel" Click="@Cancel" />
+                    <RadzenButton ButtonStyle="ButtonStyle.Light" Variant="Variant.Flat" Size="ButtonSize.Large" Icon="delete" Text="Delete" Click="@Delete" />
+                    <RadzenButton ButtonType="ButtonType.Submit" Size="ButtonSize.Large" Icon="save" Text="Apply Changes" />
+                </RadzenStack>
+            </RadzenTemplateForm>
+        }
+    </ChildContent>
+    <ErrorContent Context="ex">
+        <p class="errorUI">An error has occurred: @ex.Message</p>
+    </ErrorContent>
+</ErrorBoundary>

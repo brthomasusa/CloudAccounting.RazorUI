@@ -16,38 +16,46 @@
             }
             else
             {
-                <RadzenDataGrid TItem="CompanyDetail" Data="@(_companies)" IsLoading="@isLoading"
-                    LoadData="@GetCompanies" Count="@(_companies!.Count)" AllowFiltering="true"
-                    FilterMode="FilterMode.Simple" AllowPaging="true" AllowSorting="true"
-                    FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive" Density="Density.Compact"
-                    AllowAlternatingRows="true" PageSize="20" PageSizeText="Rows per page" ShowPagingSummary="true"
-                    PagerHorizontalAlign="HorizontalAlign.Center">
-                    <Columns>
-                        <RadzenDataGridColumn TItem="CompanyDetail" Property="CompanyCode" Title="ID"
-                                              Filterable="false" Width="20px" />
-                        <RadzenDataGridColumn TItem="CompanyDetail" Property="CompanyName" Title="Name"
-                                              Filterable="false" Width="72px" />
-                        <RadzenDataGridColumn TItem="CompanyDetail" Property="Address" Title="Address"
-                                              Filterable="false" Width="72px" />
-                        <RadzenDataGridColumn TItem="CompanyDetail" Property="City" Title="City"
-                                              Filterable="false" Width="50px" />
-                        <RadzenDataGridColumn TItem="CompanyDetail" Property="Zipcode" Title="Zipcode"
-                                              Filterable="false" Width="30px" />
-                        <RadzenDataGridColumn TItem="CompanyDetail" Property="Phone" Title="Phone"
-                                              Filterable="false" Width="45px" />
-                        <RadzenDataGridColumn TItem="CompanyDetail" Property="Fax" Title="Fax"
-                                              Filterable="false" Width="45px" />
-                        <RadzenDataGridColumn TItem="CompanyDetail" Property="Currency" Title="Currency"
-                                              Filterable="false" Width="35px" />
-                        <RadzenDataGridColumn TItem="CompanyDetail" Sortable="false" Filterable="false" Width="20px">
-                            <Template Context="item">
-                                <RadzenButton Click="() => ViewCompanyDetails(item)" Icon="visibility"
-                                              Size="ButtonSize.ExtraSmall" class="rz-border-radius-10 rz-shadow-6"
-                                              ButtonStyle="ButtonStyle.Primary" />
-                            </Template>
-                        </RadzenDataGridColumn>
-                    </Columns>
-                </RadzenDataGrid>
+                <ErrorBoundary>
+                    <ChildContent>
+                        <RadzenDataGrid TItem="CompanyDetail" Data="@(_companies)" IsLoading="@isLoading"
+                                        LoadData="@GetCompanies" Count="@(_companies!.Count)" AllowFiltering="true"
+                                        FilterMode="FilterMode.Simple" AllowPaging="true" AllowSorting="true"
+                                        FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive" Density="Density.Compact"
+                                        AllowAlternatingRows="true" PageSize="20" PageSizeText="Rows per page" ShowPagingSummary="true"
+                                        PagerHorizontalAlign="HorizontalAlign.Center">
+                            <Columns>
+                                <RadzenDataGridColumn TItem="CompanyDetail" Property="CompanyCode" Title="ID"
+                                                      Filterable="false" Width="20px" />
+                                <RadzenDataGridColumn TItem="CompanyDetail" Property="CompanyName" Title="Name"
+                                                      Filterable="false" Width="72px" />
+                                <RadzenDataGridColumn TItem="CompanyDetail" Property="Address" Title="Address"
+                                                      Filterable="false" Width="72px" />
+                                <RadzenDataGridColumn TItem="CompanyDetail" Property="City" Title="City"
+                                                      Filterable="false" Width="50px" />
+                                <RadzenDataGridColumn TItem="CompanyDetail" Property="Zipcode" Title="Zipcode"
+                                                      Filterable="false" Width="30px" />
+                                <RadzenDataGridColumn TItem="CompanyDetail" Property="Phone" Title="Phone"
+                                                      Filterable="false" Width="45px" />
+                                <RadzenDataGridColumn TItem="CompanyDetail" Property="Fax" Title="Fax"
+                                                      Filterable="false" Width="45px" />
+                                <RadzenDataGridColumn TItem="CompanyDetail" Property="Currency" Title="Currency"
+                                                      Filterable="false" Width="35px" />
+                                <RadzenDataGridColumn TItem="CompanyDetail" Sortable="false" Filterable="false" Width="20px">
+                                    <Template Context="item">
+                                        <RadzenButton Click="() => ViewCompanyDetails(item)" Icon="visibility"
+                                                      Size="ButtonSize.ExtraSmall" class="rz-border-radius-10 rz-shadow-6"
+                                                      ButtonStyle="ButtonStyle.Primary" />
+                                    </Template>
+                                </RadzenDataGridColumn>
+                            </Columns>
+                        </RadzenDataGrid>
+                    </ChildContent>
+                    <ErrorContent Context="ex">
+                        <!-- Fallback UI when an error occurs -->
+                        <p class="errorUI">An error has occurred: @ex.Message</p>
+                    </ErrorContent>
+                </ErrorBoundary>
             }
         </RadzenColumn>
     </RadzenRow>
