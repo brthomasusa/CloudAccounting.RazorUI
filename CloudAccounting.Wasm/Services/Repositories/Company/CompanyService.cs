@@ -1,4 +1,6 @@
-﻿namespace CloudAccounting.Wasm.Services.Repositories.Company
+﻿using System.Text;
+
+namespace CloudAccounting.Wasm.Services.Repositories.Company
 {
     public class CompanyService
     (
@@ -58,9 +60,6 @@
                     new Error("CompanyService.GetCompanyByIdAsync", errMsg)
                 );
             }
-
-
-            throw new NotImplementedException();
         }
 
         public async Task<Result<List<CompanyDetail>>> GetCompaniesAsync
@@ -111,6 +110,54 @@
                     new Error("CompanyService.GetCompaniesAsync", errMsg)
                 );
             }
+        }
+
+        public Task<Result<CompanyDetail>> CreateCompanyAsync(CompanyDetail company)
+        {
+            throw new NotImplementedException();
+        }
+
+        public async Task<Result> UpdateCompanyAsync(CompanyDetail company)
+        {
+            try
+            {
+                string jsonString = JsonSerializer.Serialize(company);
+                StringContent content = new(jsonString, Encoding.UTF8, "application/json");
+                using HttpResponseMessage response = await _httpClient.PutAsync(relativePath, content);
+
+                response.EnsureSuccessStatusCode();
+
+                return Result.Success();
+            }
+            catch (HttpRequestException e)
+            {
+                if (e.StatusCode.HasValue)
+                {
+                    _logger!.LogError("CompanyService.UpdateCompanyAsync: Status Code: {statusCode}", e.StatusCode.Value);
+                }
+
+                return Result<CompanyDetail>.Failure<CompanyDetail>(
+                    new Error("CompanyService.UpdateCompanyAsync", Helpers.GetExceptionMessage(e))
+                );
+            }
+            catch (TaskCanceledException e)
+            {
+                _logger!.LogError("CompanyService.UpdateCompanyAsync: Request timed out or was canceled: {errMsg}", e.Message);
+
+                return Result.Failure(new Error("CompanyService.UpdateCompanyAsync", e.Message));
+            }
+            catch (Exception ex)
+            {
+                string errMsg = Helpers.GetExceptionMessage(ex);
+                _logger!.LogError(ex, "{Message}", errMsg);
+
+                return Result.Failure(new Error("CompanyService.UpdateCompanyAsync", errMsg));
+            }
+        }
+
+        public Task<Result> DeleteCompanyAsync(int companyCode)
+        {
+            throw new NotImplementedException();
         }
     }
 }

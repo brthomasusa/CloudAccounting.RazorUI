@@ -13,5 +13,11 @@ namespace CloudAccounting.Wasm.Services.Repositories.Company
             int pageNumber,
             int pageSize
         );
+
+        Task<Result<CompanyDetail>> CreateCompanyAsync(CompanyDetail company);
+
+        Task<Result> UpdateCompanyAsync(CompanyDetail company);
+
+        Task<Result> DeleteCompanyAsync(int companyCode);
     }
 }

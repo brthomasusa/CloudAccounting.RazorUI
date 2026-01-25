@@ -1,4 +1,6 @@
 ﻿using CloudAccounting.Wasm.Services.Repositories.Company;
+using Microsoft.AspNetCore.Components.Routing;
+using Polly;
 using Radzen.Blazor;
 using System.Collections.ObjectModel;
 
@@ -9,6 +11,7 @@ namespace CloudAccounting.Wasm.Pages.Company
         [Parameter] public int CompanyCode { get; set; }
         [Inject] private ICompanyService? CompanyService { get; set; }
         [Inject] private NotificationService? NotificationService { get; set; }
+        [Inject] private DialogService? DialogService { get; set; }
         [Inject] private NavigationManager? Navigation { get; set; }
         [Inject] private ILogger<CompanyEditPage>? Logger { get; set; }
 
@@ -16,6 +19,7 @@ namespace CloudAccounting.Wasm.Pages.Company
         private string? _companyName;
         private static ReadOnlyCollection<string> _currencies = ["CAN", "USD"];
         private RadzenTemplateForm<CompanyDetail>? _companyDetailForm;
+        private bool _hasUnsavedChanges = false;
 
         protected override async Task OnParametersSetAsync()
         {
@@ -39,20 +43,73 @@ namespace CloudAccounting.Wasm.Pages.Company
             }
         }
 
-        private void Submit(CompanyDetail arg)
+        private async Task Submit(CompanyDetail arg)
         {
             // manual validation
             // bool isValid = _companyDetailForm.EditContext.Validate();
+
+            Result result = await CompanyService!.UpdateCompanyAsync(arg);
+
+            if (result.IsSuccess)
+            {
+                NotificationService!.Notify(new NotificationMessage
+                {
+                    Severity = NotificationSeverity.Info,
+                    Summary = "Update succeeded",
+                    Detail = $"Successfully updated details for {arg.CompanyName}.",
+                    Duration = 4000
+                });
+
+                _hasUnsavedChanges = false;
+            }
+            else
+            {
+                Logger!.LogError("Failed to update company: {ERROR}.", result.Error.Message);
+
+                ShowErrorNotification.ShowError(
+                    NotificationService!,
+                    result.Error.Message
+                );                
+            }
+
+            Navigation?.NavigateTo("/Pages/Company/CompaniesListPage");
         }
 
-        private void Cancel()
+        private async Task Cancel()
         {
-            Navigation?.NavigateTo("/Pages/Company/CompaniesListPage");
+            if (_hasUnsavedChanges)
+            {
+                string msg = "There are unsaved changes. Leave without saving?";
+                var dialogResponse = await DialogService!.Confirm(msg, "Leave without saving?", new ConfirmOptions() { OkButtonText = "Yes", CancelButtonText = "No" });
+
+                if ((bool)dialogResponse)
+                {
+                    Navigation?.NavigateTo("/Pages/Company/CompaniesListPage");
+                }
+            }
+            else
+            {
+                Navigation?.NavigateTo("/Pages/Company/CompaniesListPage");
+            }
         }
 
         private void Delete()
         {
             Navigation?.NavigateTo("/Pages/Company/CompaniesListPage");
+        }
+
+        private async Task OnBeforeInternalNavigation(LocationChangingContext context)
+        {
+            if (context.IsNavigationIntercepted && _hasUnsavedChanges)
+            {
+                string msg = "There are unsaved changes. Leave without saving?";
+                var dialogResponse = await DialogService!.Confirm(msg, "Leave without saving?", new ConfirmOptions() { OkButtonText = "Yes", CancelButtonText = "No" });
+
+                if (!(bool)dialogResponse)
+                {
+                    context.PreventNavigation();
+                }
+            }
         }
     }
 }
