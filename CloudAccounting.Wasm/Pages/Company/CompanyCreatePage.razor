@@ -107,10 +107,14 @@
                     </RadzenStack>
                 </RadzenColumn>
             </RadzenRow>
-            <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.Center" Gap="1rem" class="rz-mt-8 rz-mb-4">
-                <RadzenButton ButtonStyle="ButtonStyle.Light" Variant="Variant.Flat" Size="ButtonSize.Large" Icon="cancel" Text="Cancel" Click="@Cancel" />
-                <RadzenButton ButtonType="ButtonType.Submit" Size="ButtonSize.Large" Icon="save" Text="Apply Changes" />
-            </RadzenStack>
+            <RadzenRow AlignItems="AlignItems.Center">
+                <RadzenColumn Size="6" class="rz-text-align-start">
+                    <RadzenButton ButtonStyle="ButtonStyle.Light" Variant="Variant.Flat" Size="ButtonSize.Large" Icon="cancel" Text="Cancel" Click="@Cancel" />
+                </RadzenColumn>
+                <RadzenColumn Size="6" class="rz-text-align-end">
+                    <RadzenButton ButtonType="ButtonType.Submit" Size="ButtonSize.Large" Icon="save" Text="Save" />
+                </RadzenColumn>
+            </RadzenRow>
         </RadzenTemplateForm>
     </ChildContent>
     <ErrorContent Context="ex">

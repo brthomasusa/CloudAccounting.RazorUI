@@ -123,11 +123,15 @@
                         </RadzenStack>
                     </RadzenColumn>
                 </RadzenRow>
-                <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.Center" Gap="1rem" class="rz-mt-8 rz-mb-4">
-                    <RadzenButton ButtonStyle="ButtonStyle.Light" Variant="Variant.Flat" Size="ButtonSize.Large" Icon="cancel" Text="Cancel" Click="@Cancel" />
-                    <RadzenButton ButtonStyle="ButtonStyle.Light" Variant="Variant.Flat" Size="ButtonSize.Large" Icon="delete" Text="Delete" Click="@Delete" />
-                    <RadzenButton ButtonType="ButtonType.Submit" Size="ButtonSize.Large" Icon="save" Text="Apply Changes" />
-                </RadzenStack>
+                <RadzenRow AlignItems="AlignItems.Center">
+                    <RadzenColumn Size="6" class="rz-text-align-start">
+                        <RadzenButton class="rz-mr-4" ButtonStyle="ButtonStyle.Light" Variant="Variant.Flat" Size="ButtonSize.Large" Icon="cancel" Text="Cancel" Click="@Cancel" />
+                        <RadzenButton ButtonStyle="ButtonStyle.Light" Variant="Variant.Flat" Size="ButtonSize.Large" Icon="delete" Text="Delete" Click="@Delete" />
+                    </RadzenColumn>
+                    <RadzenColumn Size="6" class="rz-text-align-end">
+                        <RadzenButton ButtonType="ButtonType.Submit" Size="ButtonSize.Large" Icon="save" Text="Apply Changes" />
+                    </RadzenColumn>
+                </RadzenRow>
             </RadzenTemplateForm>
         }
     </ChildContent>

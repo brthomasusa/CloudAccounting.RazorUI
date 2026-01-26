@@ -1,5 +1,6 @@
 ﻿using CloudAccounting.Wasm.Services.Repositories.Company;
 using Microsoft.AspNetCore.Components.Routing;
+using Polly;
 using Radzen.Blazor;
 using System.Collections.ObjectModel;
 
@@ -98,32 +99,38 @@ namespace CloudAccounting.Wasm.Pages.Company
 
         private async Task Delete()
         {
-            Result result = await CompanyService!.DeleteCompanyAsync(_company!.CompanyCode);
+            string msg = $"Do you wish to delete {_company!.CompanyName}? This can't be undone!";
+            var dialogResponse = await DialogService!.Confirm(msg, $"Delete {_company!.CompanyName}?", new ConfirmOptions() { OkButtonText = "Yes", CancelButtonText = "No" });
 
-            if (result.IsSuccess)
+            if ((bool)dialogResponse)
             {
-                NotificationService!.Notify(new NotificationMessage
+                Result result = await CompanyService!.DeleteCompanyAsync(_company!.CompanyCode);
+
+                if (result.IsSuccess)
                 {
-                    Style = "position: absolute; inset-inline-start: -1000px;",
-                    Severity = NotificationSeverity.Success,
-                    Summary = "Delete succeeded",
-                    Detail = $"Successfully deleted {_company!.CompanyName}.",
-                    Duration = 4000
-                });
+                    NotificationService!.Notify(new NotificationMessage
+                    {
+                        Style = "position: absolute; inset-inline-start: -1000px;",
+                        Severity = NotificationSeverity.Success,
+                        Summary = "Delete succeeded",
+                        Detail = $"Successfully deleted {_company!.CompanyName}.",
+                        Duration = 4000
+                    });
 
-                _hasUnsavedChanges = false;
+                    _hasUnsavedChanges = false;
+                }
+                else
+                {
+                    Logger!.LogError("Failed to delete company: {ERROR}.", result.Error.Message);
+
+                    ShowErrorNotification.ShowError(
+                        NotificationService!,
+                        result.Error.Message
+                    );
+                }
+
+                Navigation?.NavigateTo("/Pages/Company/CompaniesListPage");
             }
-            else
-            {
-                Logger!.LogError("Failed to delete company: {ERROR}.", result.Error.Message);
-
-                ShowErrorNotification.ShowError(
-                    NotificationService!,
-                    result.Error.Message
-                );
-            }
-
-            Navigation?.NavigateTo("/Pages/Company/CompaniesListPage");
         }
 
         private async Task OnBeforeInternalNavigation(LocationChangingContext context)
