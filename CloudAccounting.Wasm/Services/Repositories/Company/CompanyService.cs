@@ -1,4 +1,6 @@
-﻿using System.Text;
+﻿using System;
+using System.Net.Http.Headers;
+using System.Text;
 
 namespace CloudAccounting.Wasm.Services.Repositories.Company
 {
@@ -192,9 +194,55 @@ namespace CloudAccounting.Wasm.Services.Repositories.Company
             }
         }
 
-        public Task<Result> DeleteCompanyAsync(int companyCode)
+        public async Task<Result> DeleteCompanyAsync(int companyCode)
         {
-            throw new NotImplementedException();
+            try
+            {
+                DeleteCompanyCommand command = new(companyCode);
+
+                var memStream = new MemoryStream();
+                await JsonSerializer.SerializeAsync(memStream, command);
+                memStream.Seek(0, SeekOrigin.Begin);
+
+                var request = new HttpRequestMessage(HttpMethod.Delete, relativePath);
+                request.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+
+                using var requestContent = new StreamContent(memStream);
+                request.Content = requestContent;
+                requestContent.Headers.ContentType = new MediaTypeHeaderValue("application/json");
+
+                HttpResponseMessage response = await _httpClient.SendAsync(request, HttpCompletionOption.ResponseHeadersRead);
+
+                response.EnsureSuccessStatusCode();
+
+                return Result.Success();
+            }
+            catch (HttpRequestException e)
+            {
+                if (e.StatusCode.HasValue)
+                {
+                    _logger!.LogError("CompanyService.DeleteCompanyAsync: Status Code: {statusCode}", e.StatusCode.Value);
+                }
+
+                return Result<CompanyDetail>.Failure<CompanyDetail>(
+                    new Error("CompanyService.DeleteCompanyAsync", Helpers.GetExceptionMessage(e))
+                );
+            }
+            catch (TaskCanceledException e)
+            {
+                _logger!.LogError("CompanyService.DeleteCompanyAsync: Request timed out or was canceled: {errMsg}", e.Message);
+
+                return Result.Failure(new Error("CompanyService.DeleteCompanyAsync", e.Message));
+            }
+            catch (Exception ex)
+            {
+                string errMsg = Helpers.GetExceptionMessage(ex);
+                _logger!.LogError(ex, "{Message}", errMsg);
+
+                return Result.Failure(new Error("CompanyService.DeleteCompanyAsync", errMsg));
+            }
         }
+
+        private record DeleteCompanyCommand(int CompanyCode);
     }
 }

@@ -96,8 +96,33 @@ namespace CloudAccounting.Wasm.Pages.Company
             }
         }
 
-        private void Delete()
+        private async Task Delete()
         {
+            Result result = await CompanyService!.DeleteCompanyAsync(_company!.CompanyCode);
+
+            if (result.IsSuccess)
+            {
+                NotificationService!.Notify(new NotificationMessage
+                {
+                    Style = "position: absolute; inset-inline-start: -1000px;",
+                    Severity = NotificationSeverity.Success,
+                    Summary = "Delete succeeded",
+                    Detail = $"Successfully deleted {_company!.CompanyName}.",
+                    Duration = 4000
+                });
+
+                _hasUnsavedChanges = false;
+            }
+            else
+            {
+                Logger!.LogError("Failed to delete company: {ERROR}.", result.Error.Message);
+
+                ShowErrorNotification.ShowError(
+                    NotificationService!,
+                    result.Error.Message
+                );
+            }
+
             Navigation?.NavigateTo("/Pages/Company/CompaniesListPage");
         }
 
