@@ -18,6 +18,11 @@
             {
                 <ErrorBoundary>
                     <ChildContent>
+                        <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Start" JustifyContent="JustifyContent.Normal" Gap="1rem" class="rz-mt-8 rz-mb-4">
+                            <RadzenButton Click="() => GoToCreateCompanyPage()" Icon="add_circle"
+                                          Size="ButtonSize.Large" class="rz-border-radius-10 rz-shadow-6"
+                                          ButtonStyle="ButtonStyle.Primary" />
+                        </RadzenStack>
                         <RadzenDataGrid TItem="CompanyDetail" Data="@(_companies)" IsLoading="@isLoading"
                                         LoadData="@GetCompanies" Count="@(_companies!.Count)" AllowFiltering="true"
                                         FilterMode="FilterMode.Simple" AllowPaging="true" AllowSorting="true"

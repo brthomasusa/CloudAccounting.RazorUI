@@ -112,9 +112,46 @@ namespace CloudAccounting.Wasm.Services.Repositories.Company
             }
         }
 
-        public Task<Result<CompanyDetail>> CreateCompanyAsync(CompanyDetail company)
+        public async Task<Result<CompanyDetail>> CreateCompanyAsync(CompanyDetail company)
         {
-            throw new NotImplementedException();
+            try
+            {
+                string jsonString = JsonSerializer.Serialize(company);
+                StringContent content = new(jsonString, Encoding.UTF8, "application/json");
+                using HttpResponseMessage response = await _httpClient.PostAsync(relativePath, content);
+
+                response.EnsureSuccessStatusCode();
+
+                return await response.Content.ReadFromJsonAsync<CompanyDetail>();
+            }
+            catch (HttpRequestException e)
+            {
+                if (e.StatusCode.HasValue)
+                {
+                    _logger!.LogError("CompanyService.CreateCompanyAsync: Status Code: {statusCode}", e.StatusCode.Value);
+                }
+
+                return Result<CompanyDetail>.Failure<CompanyDetail>(
+                    new Error("CompanyService.UpdateCompanyAsync", Helpers.GetExceptionMessage(e))
+                );
+            }
+            catch (TaskCanceledException e)
+            {
+                _logger!.LogError("CompanyService.CreateCompanyAsync: Request timed out or was canceled: {errMsg}", e.Message);
+
+                return Result<CompanyDetail>.Failure<CompanyDetail>(
+                    new Error("CompanyService.CreateCompanyAsync", e.Message)
+                );
+            }
+            catch (Exception ex)
+            {
+                string errMsg = Helpers.GetExceptionMessage(ex);
+                _logger!.LogError(ex, "{Message}", errMsg);
+
+                return Result<CompanyDetail>.Failure<CompanyDetail>(
+                    new Error("CompanyService.CreateCompanyAsync", errMsg)
+                );
+            }
         }
 
         public async Task<Result> UpdateCompanyAsync(CompanyDetail company)

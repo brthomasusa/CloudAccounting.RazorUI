@@ -92,5 +92,10 @@ namespace CloudAccounting.Wasm.Pages.Company
         {
             Navigation!.NavigateTo($"/Pages/Company/CompanyEditPage/{model.CompanyCode}");
         }
+
+        private void GoToCreateCompanyPage()
+        {
+            Navigation!.NavigateTo("/Pages/Company/CompanyCreatePage");
+        }
     }
 }

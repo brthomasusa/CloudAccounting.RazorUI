@@ -1,0 +1,119 @@
+﻿@page "/Pages/Company/CompanyCreatePage"
+@using Radzen
+
+<PageTitle>Create Company</PageTitle>
+
+<RadzenText TextStyle="TextStyle.Subtitle1">Create Company</RadzenText>
+
+<ErrorBoundary>
+    <ChildContent>
+        <NavigationLock OnBeforeInternalNavigation="OnBeforeInternalNavigation" ConfirmExternalNavigation="_hasUnsavedChanges" />
+
+        <RadzenTemplateForm @ref="_companyDetailForm" Data="@_company" Submit="@(async (CompanyDetail args) => { await Submit(args); })">
+            <RadzenRow Gap="2rem" class="rz-p-0 rz-p-lg-4">
+                <RadzenColumn Size="12" SizeMD="8">
+                    <RadzenStack Gap="1rem">
+                        <RadzenStack Orientation="Orientation.Vertical" Gap="0.5rem">
+                            <RadzenLabel Component="companyNameInput">
+                                Company Name <span style="color: var(--rz-danger);">*</span>
+                            </RadzenLabel>
+
+                            <RadzenTextBox Name="companyNameInput"
+                                           @bind-Value=@_company!.CompanyName
+                                           Placeholder="Enter company name"
+                                           @oninput="@(e => _hasUnsavedChanges = true)" />
+                            <RadzenRequiredValidator Component="companyNameInput" Text="Missing company name" Popup="true" Style="position: absolute" />
+                            <RadzenLengthValidator Component="companyNameInput" Max="100" Text="Company name should be at most 100 characters" Popup=true Style="position: absolute" />
+                        </RadzenStack>
+
+                        <RadzenStack Orientation="Orientation.Vertical" Gap="0.5rem">
+                            <RadzenLabel Component="addressInput">
+                                Address <span style="color: var(--rz-danger);">*</span>
+                            </RadzenLabel>
+                            <small style="display: block">(example: 1234 Main St, Ste 100)</small>
+                            <RadzenTextArea Name="addressInput"
+                                            @bind-Value=@_company!.Address
+                                            Placeholder="Enter company address"
+                                            @oninput="@(e => _hasUnsavedChanges = true)" />
+                            <RadzenRequiredValidator Component="addressInput" Text="Missing address" Popup="true" Style="position: absolute" />
+                        </RadzenStack>
+
+                        <RadzenStack Orientation="Orientation.Vertical" Gap="0.5rem">
+                            <RadzenLabel Component="cityInput">
+                                City <span style="color: var(--rz-danger);">*</span>
+                            </RadzenLabel>
+                            <RadzenTextBox Name="cityInput"
+                                           @bind-Value=@_company!.City
+                                           Placeholder="Enter city name"
+                                           @oninput="@(e => _hasUnsavedChanges = true)" />
+                            <RadzenRequiredValidator Component="cityInput" Text="Missing city name" Popup="true" Style="position: absolute" />
+                        </RadzenStack>
+
+                        <RadzenStack Orientation="Orientation.Vertical" Gap="0.5rem">
+                            <RadzenLabel Component="zipcodeInput">
+                                Zipcode <span style="color: var(--rz-danger);">*</span>
+                            </RadzenLabel>
+                            <RadzenTextBox Name="zipcodeInput"
+                                           @bind-Value=@_company!.Zipcode
+                                           Placeholder="Enter zipcode"
+                                           @oninput="@(e => _hasUnsavedChanges = true)" />
+                            <RadzenRequiredValidator Component="zipcodeInput" Text="Missing zipcode" Popup="true" Style="position: absolute" />
+                        </RadzenStack>
+
+                        <RadzenStack Orientation="Orientation.Vertical" Gap="0.5rem">
+                            <RadzenLabel Component="telephoneInput">
+                                Telephone <span style="color: var(--rz-danger);">*</span>
+                            </RadzenLabel>
+                            <RadzenTextBox Name="telephoneInput"
+                                           @bind-Value=@_company!.Phone
+                                           Placeholder="Enter telephone number"
+                                           @oninput="@(e => _hasUnsavedChanges = true)" />
+                            <RadzenRequiredValidator Component="telephoneInput" Text="Missing telephone number" Popup="true" Style="position: absolute" />
+                            <RadzenLengthValidator Component="telephoneInput" Max="15" Text="Telephone number should be at most 15 characters" Popup=true Style="position: absolute" />
+                            <RadzenCustomValidator Component="telephoneInput"
+                                                   Validator="@(() => PhoneNumberUtility.IsValidPhoneNumber(_company.Phone!))"
+                                                   Text="Invalid phone number"
+                                                   Popup="true"
+                                                   Style="position: absolute" />
+                        </RadzenStack>
+
+                        <RadzenStack Orientation="Orientation.Vertical" Gap="0.5rem">
+                            <RadzenLabel Component="faxInput">
+                                Fax <span style="color: var(--rz-danger);">*</span>
+                            </RadzenLabel>
+                            <RadzenTextBox Name="faxInput"
+                                           @bind-Value=@_company!.Fax
+                                           Placeholder="Enter fax number"
+                                           @oninput="@(e => _hasUnsavedChanges = true)" />
+                            <RadzenRequiredValidator Component="faxInput" Text="Missing fax number" Popup="true" Style="position: absolute" />
+                            <RadzenLengthValidator Component="faxInput" Max="15" Text="Fax number should be at most 15 characters" Popup=true Style="position: absolute" />
+                            <RadzenCustomValidator Component="faxInput"
+                                                   Validator="@(() => PhoneNumberUtility.IsValidPhoneNumber(_company.Fax!))"
+                                                   Text="Invalid fax number"
+                                                   Popup="true"
+                                                   Style="position: absolute" />
+                        </RadzenStack>
+
+                        <RadzenStack Orientation="Orientation.Vertical" Gap="0.5rem">
+                            <RadzenLabel Component="currencyInput">
+                                Currency <span style="color: var(--rz-danger);">*</span>
+                            </RadzenLabel>
+                            <RadzenDropDown Name="currencyInput"
+                                            @bind-Value=@_company!.Currency
+                                            Data=@_currencies Style="width: 100%;"
+                                            @oninput="@(e => _hasUnsavedChanges = true)" />
+                            <RadzenRequiredValidator Component="currencyInput" Text="Missing currency" Popup="true" Style="position: absolute" />
+                        </RadzenStack>
+                    </RadzenStack>
+                </RadzenColumn>
+            </RadzenRow>
+            <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.Center" Gap="1rem" class="rz-mt-8 rz-mb-4">
+                <RadzenButton ButtonStyle="ButtonStyle.Light" Variant="Variant.Flat" Size="ButtonSize.Large" Icon="cancel" Text="Cancel" Click="@Cancel" />
+                <RadzenButton ButtonType="ButtonType.Submit" Size="ButtonSize.Large" Icon="save" Text="Apply Changes" />
+            </RadzenStack>
+        </RadzenTemplateForm>
+    </ChildContent>
+    <ErrorContent Context="ex">
+        <p class="errorUI">An error has occurred: @ex.Message</p>
+    </ErrorContent>
+</ErrorBoundary>

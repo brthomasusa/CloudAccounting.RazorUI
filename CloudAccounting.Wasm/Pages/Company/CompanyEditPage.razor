@@ -81,18 +81,32 @@
                                     Placeholder="Enter telephone number" 
                                     @oninput="@(e => _hasUnsavedChanges = true)" />
                                 <RadzenRequiredValidator Component="telephoneInput" Text="Missing telephone number" Popup="true" Style="position: absolute" />
+                                <RadzenLengthValidator Component="telephoneInput" Max="15" Text="Telephone number should be at most 15 characters" Popup=true Style="position: absolute" />
+                                <RadzenCustomValidator 
+                                    Component="telephoneInput" 
+                                    Validator="@(() => PhoneNumberUtility.IsValidPhoneNumber(_company.Phone!))" 
+                                    Text="Invalid phone number" 
+                                    Popup="true" 
+                                    Style="position: absolute" />
                             </RadzenStack>
 
                             <RadzenStack Orientation="Orientation.Vertical" Gap="0.5rem">
                                 <RadzenLabel Component="faxInput">
                                     Fax <span style="color: var(--rz-danger);">*</span>
                                 </RadzenLabel>
-                                <RadzenTextArea 
+                                <RadzenTextBox 
                                     Name="faxInput" 
                                     @bind-Value=@_company.Fax 
                                     Placeholder="Enter fax number" 
                                     @oninput="@(e => _hasUnsavedChanges = true)" />
                                 <RadzenRequiredValidator Component="faxInput" Text="Missing fax number" Popup="true" Style="position: absolute" />
+                                <RadzenLengthValidator Component="faxInput" Max="15" Text="Fax number should be at most 15 characters" Popup=true Style="position: absolute" />
+                                <RadzenCustomValidator 
+                                    Component="faxInput"
+                                    Validator="@(() => PhoneNumberUtility.IsValidPhoneNumber(_company.Fax!))"
+                                    Text="Invalid fax number"
+                                    Popup="true"
+                                    Style="position: absolute" />
                             </RadzenStack>
 
                             <RadzenStack Orientation="Orientation.Vertical" Gap="0.5rem">

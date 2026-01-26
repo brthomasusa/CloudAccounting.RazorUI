@@ -5,42 +5,18 @@ using System.Collections.ObjectModel;
 
 namespace CloudAccounting.Wasm.Pages.Company
 {
-    public partial class CompanyEditPage
+    public partial class CompanyCreatePage
     {
-        [Parameter] public int CompanyCode { get; set; }
         [Inject] private ICompanyService? CompanyService { get; set; }
         [Inject] private NotificationService? NotificationService { get; set; }
         [Inject] private DialogService? DialogService { get; set; }
         [Inject] private NavigationManager? Navigation { get; set; }
-        [Inject] private ILogger<CompanyEditPage>? Logger { get; set; }
+        [Inject] private ILogger<CompanyCreatePage>? Logger { get; set; }
 
-        private CompanyDetail? _company;
-        private string? _companyName;
+        private CompanyDetail? _company = new();
         private static ReadOnlyCollection<string> _currencies = ["CAN", "USD"];
         private RadzenTemplateForm<CompanyDetail>? _companyDetailForm;
         private bool _hasUnsavedChanges = false;
-
-        protected override async Task OnParametersSetAsync()
-        {
-            Result<CompanyDetail> result = await CompanyService!.GetCompanyByIdAsync(CompanyCode);
-
-            if (result.IsSuccess)
-            {
-                _company = result.Value;
-                _companyName = result.Value.CompanyName;
-            }
-            else 
-            {
-                Logger!.LogError("Failed to retrieve company: {ERROR}.", result.Error.Message);
-
-                ShowErrorNotification.ShowError(
-                    NotificationService!,
-                    result.Error.Message
-                );
-
-                Navigation?.NavigateTo("/Pages/Company/CompaniesListPage");
-            }
-        }
 
         private async Task Submit(CompanyDetail arg)
         {
@@ -50,7 +26,7 @@ namespace CloudAccounting.Wasm.Pages.Company
             _company!.Phone = PhoneNumberUtility.GetFormattedPhoneNumber(arg.Phone!);
             _company!.Fax = PhoneNumberUtility.GetFormattedPhoneNumber(arg.Fax!);
 
-            Result result = await CompanyService!.UpdateCompanyAsync(arg);
+            Result<CompanyDetail> result = await CompanyService!.CreateCompanyAsync(arg);
 
             if (result.IsSuccess)
             {
@@ -58,8 +34,8 @@ namespace CloudAccounting.Wasm.Pages.Company
                 {
                     Style = "position: absolute; inset-inline-start: -1000px;",
                     Severity = NotificationSeverity.Success,
-                    Summary = "Update succeeded",
-                    Detail = $"Successfully updated information for {arg.CompanyName}.",
+                    Summary = "New company created",
+                    Detail = $"Successfully created new company: {result.Value.CompanyName}.",
                     Duration = 4000
                 });
 
@@ -67,12 +43,12 @@ namespace CloudAccounting.Wasm.Pages.Company
             }
             else
             {
-                Logger!.LogError("Failed to update company: {ERROR}.", result.Error.Message);
+                Logger!.LogError("Failed to create company: {ERROR}.", result.Error.Message);
 
                 ShowErrorNotification.ShowError(
                     NotificationService!,
                     result.Error.Message
-                );                
+                );
             }
 
             Navigation?.NavigateTo("/Pages/Company/CompaniesListPage");
@@ -96,11 +72,6 @@ namespace CloudAccounting.Wasm.Pages.Company
             }
         }
 
-        private void Delete()
-        {
-            Navigation?.NavigateTo("/Pages/Company/CompaniesListPage");
-        }
-
         private async Task OnBeforeInternalNavigation(LocationChangingContext context)
         {
             if (context.IsNavigationIntercepted && _hasUnsavedChanges)
@@ -114,5 +85,7 @@ namespace CloudAccounting.Wasm.Pages.Company
                 }
             }
         }
+
+
     }
 }
