@@ -23,6 +23,7 @@ builder.Services.AddHttpClient("CloudAccountingApi", client =>
 builder.Services.AddScoped(sp => sp.GetRequiredService<IHttpClientFactory>().CreateClient("CloudAccountingApi"));
 
 builder.Services.AddScoped<ICompanyService, CompanyService>();
+builder.Services.AddScoped<ILookupService, LookupService>();
 
 builder.Services.AddRadzenComponents();
 builder.Services.AddScoped<DialogService>();

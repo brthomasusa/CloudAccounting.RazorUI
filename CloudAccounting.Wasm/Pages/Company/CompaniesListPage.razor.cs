@@ -1,5 +1,4 @@
 ﻿using CloudAccounting.Wasm.Services.Repositories.Company;
-using System;
 
 namespace CloudAccounting.Wasm.Pages.Company
 {

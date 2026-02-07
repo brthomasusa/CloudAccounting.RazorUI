@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Net.Http.Headers;
-using System.Text;
 
 namespace CloudAccounting.Wasm.Services.Repositories.Company
 {
@@ -243,6 +241,148 @@ namespace CloudAccounting.Wasm.Services.Repositories.Company
             }
         }
 
-        private record DeleteCompanyCommand(int CompanyCode);
+        public async Task<Result<CompanyWithFiscalPeriodsDto>> GetCompanyFiscalYearAsync(int companyCode)
+        {
+            try
+            {
+                HttpResponseMessage response = await _httpClient.GetAsync($"{relativePath}/fiscalyear/{companyCode}");
+
+                response.EnsureSuccessStatusCode();
+
+                return await response.Content.ReadFromJsonAsync<CompanyWithFiscalPeriodsDto>();
+            }
+            catch (HttpRequestException e) when (e.StatusCode == System.Net.HttpStatusCode.NotFound)
+            {
+                string msg = $"A company with company code {companyCode} was not found.";
+
+                _logger!.LogWarning("CompanyService.GetCompanyByIdAsync: {message}", msg);
+
+                return Result<CompanyWithFiscalPeriodsDto>.Failure<CompanyWithFiscalPeriodsDto>(
+                    new Error("CompanyService.GetCompanyByIdAsync", msg)
+                );
+            }
+            catch (HttpRequestException e)
+            {
+                if (e.StatusCode.HasValue)
+                {
+                    _logger!.LogError("CompanyService.GetCompanyDtoWithoutFiscalYearAsync: Status Code: {statusCode}", e.StatusCode.Value);
+                }
+
+                return Result<CompanyWithFiscalPeriodsDto>.Failure<CompanyWithFiscalPeriodsDto>(
+                    new Error("CompanyService.GetCompanyDtoWithoutFiscalYearAsync", Helpers.GetExceptionMessage(e))
+                );
+            }
+            catch (TaskCanceledException e)
+            {
+                _logger!.LogError("CompanyService.GetCompanyDtoWithoutFiscalYearAsync: Request timed out or was canceled: {errMsg}", e.Message);
+
+                return Result<CompanyWithFiscalPeriodsDto>.Failure<CompanyWithFiscalPeriodsDto>(
+                    new Error("CompanyService.GetCompanyDtoWithoutFiscalYearAsync", Helpers.GetExceptionMessage(e))
+                );
+            }
+            catch (Exception ex)
+            {
+                string errMsg = Helpers.GetExceptionMessage(ex);
+                _logger!.LogError("CompanyService.GetCompanyDtoWithoutFiscalYearAsync: {errMsg}", errMsg);
+
+                return Result<CompanyWithFiscalPeriodsDto>.Failure<CompanyWithFiscalPeriodsDto>(
+                    new Error("CompanyService.GetCompanyDtoWithoutFiscalYearAsync", errMsg)
+                );
+            }
+        }
+
+        public async Task<Result<CompanyWithFiscalPeriodsDto>> CreateCompanyFiscalYearAsync(CreateFiscalYearCommand command)
+        {
+            try
+            {
+                var jsonCompany = JsonSerializer.Serialize(command);
+                var requestContent = new StringContent(jsonCompany, Encoding.UTF8, "application/json");
+                using HttpResponseMessage response = await _httpClient.PostAsync($"{relativePath}/fiscalyear", requestContent);
+                response.EnsureSuccessStatusCode();
+
+                var content = await response.Content.ReadAsStringAsync();
+
+                return await response.Content.ReadFromJsonAsync<CompanyWithFiscalPeriodsDto>();
+            }
+            catch (HttpRequestException e) when (e.StatusCode == System.Net.HttpStatusCode.BadRequest)
+            {
+                string msg = $"Failed to create new fiscal year {command.FiscalYear} with starting month {command.StartMonthNumber}.";
+
+                _logger!.LogError("CompanyService.GetCompanyByIdAsync: {message}", msg);
+
+                return Result<CompanyWithFiscalPeriodsDto>.Failure<CompanyWithFiscalPeriodsDto>(
+                    new Error("CompanyService.CreateCompanyFiscalYearAsync", msg)
+                );
+            }
+            catch (HttpRequestException e)
+            {
+                if (e.StatusCode.HasValue)
+                {
+                    _logger!.LogError("CompanyService.GetCompanyDtoWithoutFiscalYearAsync: Status Code: {statusCode}", e.StatusCode.Value);
+                }
+
+                return Result<CompanyWithFiscalPeriodsDto>.Failure<CompanyWithFiscalPeriodsDto>(
+                    new Error("CompanyService.CreateCompanyFiscalYearAsync", Helpers.GetExceptionMessage(e))
+                );
+            }
+            catch (TaskCanceledException e)
+            {
+                _logger!.LogError("CompanyService.GetCompanyDtoWithoutFiscalYearAsync: Request timed out or was canceled: {errMsg}", e.Message);
+
+                return Result<CompanyWithFiscalPeriodsDto>.Failure<CompanyWithFiscalPeriodsDto>(
+                    new Error("CompanyService.CreateCompanyFiscalYearAsync", Helpers.GetExceptionMessage(e))
+                );
+            }
+            catch (Exception ex)
+            {
+                string errMsg = Helpers.GetExceptionMessage(ex);
+                _logger!.LogError("CompanyService.CreateCompanyFiscalYearAsync: {errMsg}", errMsg);
+
+                return Result<CompanyWithFiscalPeriodsDto>.Failure<CompanyWithFiscalPeriodsDto>(
+                    new Error("CompanyService.CreateCompanyFiscalYearAsync", errMsg)
+                );
+            }
+
+        }
+
+        public async Task<Result<DateTime>> GetNextValidFiscalYearStartDateAsync(int companyCode)
+        {
+            try
+            {
+                HttpResponseMessage response = await _httpClient.GetAsync($"{relativePath}/validstartdate/{companyCode}");
+
+                response.EnsureSuccessStatusCode();
+
+                return await response.Content.ReadFromJsonAsync<DateTime>();
+            }
+            catch (HttpRequestException e)
+            {
+                if (e.StatusCode.HasValue)
+                {
+                    _logger!.LogError("CompanyService.GetCompanyDtoWithoutFiscalYearAsync: Status Code: {statusCode}", e.StatusCode.Value);
+                }
+
+                return Result<DateTime>.Failure<DateTime>(
+                    new Error("CompanyService.GetNextValidFiscalYearStartDateAsync", Helpers.GetExceptionMessage(e))
+                );
+            }
+            catch (TaskCanceledException e)
+            {
+                _logger!.LogError("CompanyService.GetCompanyDtoWithoutFiscalYearAsync: Request timed out or was canceled: {errMsg}", e.Message);
+
+                return Result<DateTime>.Failure<DateTime>(
+                    new Error("CompanyService.GetNextValidFiscalYearStartDateAsync", Helpers.GetExceptionMessage(e))
+                );
+            }
+            catch (Exception ex)
+            {
+                string errMsg = Helpers.GetExceptionMessage(ex);
+                _logger!.LogError("CompanyService.GetNextValidFiscalYearStartDateAsync: {errMsg}", errMsg);
+
+                return Result<DateTime>.Failure<DateTime>(
+                    new Error("CompanyService.GetCompanyDtoWithoutFiscalYearAsync", errMsg)
+                );
+            }
+        }
     }
 }
