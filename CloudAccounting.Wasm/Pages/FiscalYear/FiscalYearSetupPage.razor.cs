@@ -19,8 +19,8 @@ namespace CloudAccounting.Wasm.Pages.FiscalYear
         private CompanyWithFiscalPeriodsDto _companyWithFiscalPeriods = new();
         private int _selectedCompanyCode;
         private DateTime _validNextFiscalYearStartDate = DateTime.MinValue;
-
         private bool isLoading;
+        private bool _disableFiscalYearDeleteButton = true;
 
         protected async override Task OnInitializedAsync()
         {
@@ -93,9 +93,14 @@ namespace CloudAccounting.Wasm.Pages.FiscalYear
 
         private async Task OnCompanyDropDownChanged(object companyCode)
         {
+            await GetFiscalYears(Convert.ToInt32(companyCode));
+         }
+
+        private async Task GetFiscalYears(int companyCode)
+        {
             try
             {
-                _selectedCompanyCode = Convert.ToInt32(companyCode);
+                _selectedCompanyCode = companyCode;
 
                 Result<DateTime> validStartDateresult = await CompanyService!.GetNextValidFiscalYearStartDateAsync(_selectedCompanyCode);
 
@@ -128,8 +133,9 @@ namespace CloudAccounting.Wasm.Pages.FiscalYear
                 }
 
                 _companyWithFiscalPeriods = result.Value;
+                _disableFiscalYearDeleteButton = _companyWithFiscalPeriods.FiscalPeriods.Count == 0;
             }
-            catch (Exception ex) 
+            catch (Exception ex)
             {
                 Logger!.LogError(ex, "An exception occurred while retrieving company lookups.");
                 ShowErrorNotification.ShowError(
@@ -143,43 +149,54 @@ namespace CloudAccounting.Wasm.Pages.FiscalYear
 
         private async Task GetFiscalPeriods(LoadDataArgs args)
         {
-            try
-            {
-                Result<CompanyWithFiscalPeriodsDto> result = await CompanyService!.GetCompanyFiscalYearAsync(_selectedCompanyCode);
+            await GetFiscalYears(Convert.ToInt32(_selectedCompanyCode));
+        }
 
-                if (result.IsFailure)
+        private async Task DeleteFiscalYear()
+        {
+            int monthId = _companyWithFiscalPeriods.FiscalPeriods[0].MonthId;
+            int companyCode = _companyWithFiscalPeriods.CompanyCode;
+            int fiscalYear = _companyWithFiscalPeriods.FiscalYear;
+            string companyName = _companyWithFiscalPeriods.CompanyName!;
+
+            string msg = $"Do you wish to delete fiscal year {monthId}/{fiscalYear} for {companyName}? This can't be undone!";
+
+            var dialogResponse = await DialogService!.Confirm(msg, $"Delete fiscal year?", new ConfirmOptions() { OkButtonText = "Yes", CancelButtonText = "No" });
+
+            if ((bool)dialogResponse)
+            {
+                Result result = 
+                    await CompanyService!.DeleteCompanyFiscalYearAsync(companyCode, fiscalYear);
+
+                if (result.IsSuccess)
                 {
-                    Logger!.LogError("Failed to retrieve company fiscal year info: {ERROR}.", result.Error.Message);
+                    string successMsg = $"Successfully deleted fiscal year {monthId}/{fiscalYear} for {companyName}.";
+                    
+                    NotificationService!.Notify(new NotificationMessage
+                    {
+                        Style = "position: absolute; inset-inline-start: -1000px;",
+                        Severity = NotificationSeverity.Success,
+                        Summary = "Delete succeeded",
+                        Detail = successMsg,
+                        Duration = 4000
+                    });
+
+                    await GetFiscalYears(_selectedCompanyCode);
+                }
+                else
+                {
+                    Logger!.LogError("Failed to delete company fiscal year: {ERROR}.", result.Error.Message);
 
                     ShowErrorNotification.ShowError(
                         NotificationService!,
                         result.Error.Message
                     );
-
-                    Navigation?.NavigateTo("/");
                 }
-
-                isLoading = true;
-                _companyWithFiscalPeriods = result.Value;
-                isLoading = false;
-                await InvokeAsync(StateHasChanged);
-            }
-            catch (Exception ex)
-            {
-                Logger!.LogError(ex, "An exception occurred while retrieving company fiscal year info.");
-                ShowErrorNotification.ShowError(
-                    NotificationService!,
-                    "An unexpected error occurred while retrieving company fiscal year info."
-                );
-
-                Navigation?.NavigateTo("/");
             }
         }
 
         private async Task Submit(CreateFiscalYearCommand arg)
         {
-            //CreateFiscalYearCommand command = new(arg.CompanyCode, arg.FiscalYear, arg.StartMonthNumber);
-
             Result<CompanyWithFiscalPeriodsDto> result = await CompanyService!.CreateCompanyFiscalYearAsync(_fiscalYearCommand);
 
             if (result.IsSuccess)
@@ -195,7 +212,8 @@ namespace CloudAccounting.Wasm.Pages.FiscalYear
                     Duration = 4000
                 });
                 
-                _companyWithFiscalPeriods = result.Value;                
+                _companyWithFiscalPeriods = result.Value;
+                _disableFiscalYearDeleteButton = _companyWithFiscalPeriods.FiscalPeriods.Count == 0;
 
                 await InvokeAsync(StateHasChanged);
             }

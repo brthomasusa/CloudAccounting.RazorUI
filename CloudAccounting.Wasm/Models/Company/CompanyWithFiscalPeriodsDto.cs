@@ -6,6 +6,7 @@
         public string? CompanyName { get; set; }
         public int FiscalYear { get; set; }
         public bool IsInitialYear { get; set; }
+        public int Transactions { get; set; }
         public List<FiscalPeriodDto> FiscalPeriods { get; set; } = [];
     }
 }

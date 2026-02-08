@@ -21,5 +21,7 @@
         Task<Result<CompanyWithFiscalPeriodsDto>> CreateCompanyFiscalYearAsync(CreateFiscalYearCommand command);
 
         Task<Result<DateTime>> GetNextValidFiscalYearStartDateAsync(int companyCode);
+
+        Task<Result> DeleteCompanyFiscalYearAsync(int companyCode, int fiscalYear);
     }
 }

@@ -76,7 +76,7 @@
                             </RadzenStack>
                         </div>
                         <div class="col">
-                            <RadzenButton ButtonType="ButtonType.Submit" Size="ButtonSize.Medium" Icon="save" Text="Generate Fiscal Year" />
+                            <RadzenButton ButtonType="ButtonType.Submit" ButtonStyle="ButtonStyle.Success" Size="ButtonSize.Medium" Icon="save" Text="Generate Fiscal Year" />
                         </div>
                     </div>
                 </div>
@@ -85,7 +85,7 @@
 
         <RadzenCard Variant="Variant.Outlined" class="rz-p-0 rz-m-0 rz-mt-7">
             <div class="container">
-                <div class="row align-items-center">
+                <div class="row align-items-center mt-4">
                     <div class="col">
                         <RadzenStack Orientation="Orientation.Horizontal" Gap="0.5rem">
                             <RadzenLabel class="rz-m-0" Text="Company Name" TextStyle="TextStyle.Subtitle2" Style="width: 150px;" Component="companyNameInput" />
@@ -104,9 +104,18 @@
                             <RadzenLabel Text="Initial Year?" Component="isInitYearCheckBox" />
                         </RadzenStack>
                     </div>
+                    <div class="col">
+                        <RadzenButton 
+                            ButtonStyle="ButtonStyle.Danger" 
+                            Size="ButtonSize.Medium" 
+                            Icon="delete" 
+                            Text="Delete Fiscal Year" 
+                            Disabled="@_disableFiscalYearDeleteButton"
+                            Click="@DeleteFiscalYear" />
+                    </div>
                 </div>
                 <hr />
-                <div class="row mt-5">
+                <div class="row mt-5 mb-4">
                     <div class="col">
                         @if (_companyWithFiscalPeriods is null)
                         {
@@ -116,7 +125,7 @@
                         {
                             <ErrorBoundary>
                                 <ChildContent>
-                                    <RadzenDataGrid TItem="FiscalPeriodDto" 
+                                    <RadzenDataGrid TItem="FiscalPeriodDto" GridLines="DataGridGridLines.Horizontal"
                                         Data="@(_companyWithFiscalPeriods.FiscalPeriods)" 
                                         IsLoading="@isLoading"
                                         LoadData="@GetFiscalPeriods" 
@@ -134,7 +143,11 @@
                                             <RadzenDataGridColumn TItem="FiscalPeriodDto" Property="EndDate" Title="End"
                                                                   Filterable="false" Width="100px" FormatString="{0:d}" />
                                             <RadzenDataGridColumn TItem="FiscalPeriodDto" Property="PeriodClosed" Title="Period Closed?"
-                                                                  Filterable="false" Width="100px" />
+                                                                  Filterable="false" Width="100px">
+                                                <Template Context="data">
+                                                    @(data.PeriodClosed ? "Yes" : "No")
+                                                </Template>
+                                            </RadzenDataGridColumn>
                                         </Columns>
                                     </RadzenDataGrid>
                                 </ChildContent>

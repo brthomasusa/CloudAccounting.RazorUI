@@ -4,7 +4,7 @@ namespace CloudAccounting.Wasm.Services.Repositories.Company
 {
     public class CompanyService
     (
-        IHttpClientFactory factory, 
+        IHttpClientFactory factory,
         ILogger<CompanyService> logger
     ) : ICompanyService
     {
@@ -64,7 +64,7 @@ namespace CloudAccounting.Wasm.Services.Repositories.Company
 
         public async Task<Result<List<CompanyDetail>>> GetCompaniesAsync
         (
-            int pageNumber, 
+            int pageNumber,
             int pageSize
         )
         {
@@ -382,6 +382,51 @@ namespace CloudAccounting.Wasm.Services.Repositories.Company
                 return Result<DateTime>.Failure<DateTime>(
                     new Error("CompanyService.GetCompanyDtoWithoutFiscalYearAsync", errMsg)
                 );
+            }
+        }
+
+        public async Task<Result> DeleteCompanyFiscalYearAsync(int companyCode, int fiscalYear)
+        {
+            try
+            {
+                string uri = $"{relativePath}/fiscalyear";
+                DeleteFiscalYearCommand command = new(companyCode, fiscalYear);
+
+                var memStream = new MemoryStream();
+                await JsonSerializer.SerializeAsync(memStream, command);
+                memStream.Seek(0, SeekOrigin.Begin);
+
+                var request = new HttpRequestMessage(HttpMethod.Delete, uri);
+                request.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+
+                using var requestContent = new StreamContent(memStream);
+                request.Content = requestContent;
+                requestContent.Headers.ContentType = new MediaTypeHeaderValue("application/json");
+
+                using var response = await _httpClient.SendAsync(request, HttpCompletionOption.ResponseHeadersRead);
+
+                response.EnsureSuccessStatusCode();
+
+                return Result.Success();
+            }
+            catch (HttpRequestException e)
+            {
+                if (e.StatusCode.HasValue)
+                {
+                    _logger!.LogError("CompanyService.DeleteCompanyFiscalYearAsync: Status Code: {statusCode}", e.StatusCode.Value);
+                }
+                return Result.Failure(new Error("CompanyService.DeleteCompanyFiscalYearAsync", Helpers.GetExceptionMessage(e)));
+            }
+            catch (TaskCanceledException e)
+            {
+                _logger!.LogError("CompanyService.DeleteCompanyFiscalYearAsync: Request timed out or was canceled: {errMsg}", e.Message);
+                return Result.Failure(new Error("CompanyService.DeleteCompanyFiscalYearAsync", e.Message));
+            }
+            catch (Exception ex)
+            {
+                string errMsg = Helpers.GetExceptionMessage(ex);
+                _logger!.LogError(ex, "{Message}", errMsg);
+                return Result.Failure(new Error("CompanyService.DeleteCompanyFiscalYearAsync", errMsg));
             }
         }
     }
