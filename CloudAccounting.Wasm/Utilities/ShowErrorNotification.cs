@@ -12,6 +12,7 @@ namespace CloudAccounting.Wasm.Utilities
             notificationService!.Notify(
                 new NotificationMessage
                 {
+                    Style = "position: absolute; inset-inline-start: -1000px;",
                     Severity = NotificationSeverity.Error,
                     Summary = "The following error occured:",
                     Detail = errorMessage,

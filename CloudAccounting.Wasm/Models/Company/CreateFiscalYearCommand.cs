@@ -3,12 +3,12 @@
     public class CreateFiscalYearCommand(
         int companyCode,
         int fiscalYear,
-        int startMonthNumber
-        )
+        DateTime startDate
+    )
     {
         public int CompanyCode { get; set; } = companyCode;
         public int FiscalYear { get; set; } = fiscalYear;
-        public int StartMonthNumber { get; set; } = startMonthNumber;
+        public DateTime StartDate { get; set; } = startDate;
     }
 
 

@@ -1,4 +1,6 @@
-﻿namespace CloudAccounting.Wasm.Services.Repositories.Company
+﻿using CloudAccounting.Wasm.Models.Company;
+
+namespace CloudAccounting.Wasm.Services.Repositories.Company
 {
     public interface ICompanyService
     {
@@ -16,12 +18,12 @@
 
         Task<Result> DeleteCompanyAsync(int companyCode);
 
-        Task<Result<CompanyWithFiscalPeriodsDto>> GetCompanyFiscalYearAsync(int companyCode);
+        Task<Result<FiscalYearDto>> GetCompanyFiscalYearAsync(int companyCode);
 
-        Task<Result<CompanyWithFiscalPeriodsDto>> CreateCompanyFiscalYearAsync(CreateFiscalYearCommand command);
+        Task<Result<FiscalYearDto>> GetCompanyFiscalYearAsync(int companyCode, int fiscalYear);
 
-        Task<Result<DateTime>> GetNextValidFiscalYearStartDateAsync(int companyCode);
+        Task<Result<FiscalYearDto>> CreateCompanyFiscalYearAsync(CreateFiscalYearCommand command);
 
-        Task<Result> DeleteCompanyFiscalYearAsync(int companyCode, int fiscalYear);
+        Task<Result> DeleteCompanyFiscalYearAsync(int companyCode, int fiscalYear);        
     }
 }

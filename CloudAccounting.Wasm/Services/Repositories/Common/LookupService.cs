@@ -11,13 +11,13 @@ namespace CloudAccounting.Wasm.Services.Repositories.Common
     {
         private readonly HttpClient _httpClient = factory.CreateClient("CloudAccountingApi");
         private readonly ILogger<LookupService>? _logger = logger;
-        private const string relativePath = "/api/v1/companies";
+        private const string relativePath = "/api/v1/lookups";
 
         public async Task<Result<List<CompanyLookup>>> GetCompanyLookups()
         {
             try
             {
-                HttpResponseMessage response = await _httpClient.GetAsync($"{relativePath}/lookups");
+                HttpResponseMessage response = await _httpClient.GetAsync($"{relativePath}/companycodes");
 
                 response.EnsureSuccessStatusCode();
 

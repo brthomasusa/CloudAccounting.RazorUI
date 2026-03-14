@@ -1,5 +1,4 @@
 ﻿using CloudAccounting.Wasm.Services.Repositories.Company;
-using Radzen.Blazor;
 
 namespace CloudAccounting.Wasm.Pages.FiscalYear
 {
@@ -12,34 +11,34 @@ namespace CloudAccounting.Wasm.Pages.FiscalYear
         [Inject] private NavigationManager? Navigation { get; set; }
         [Inject] private ILogger<FiscalYearSetupPage>? Logger { get; set; }
 
-        //private RadzenTemplateForm<CreateFiscalYearCommand>? _fiscalYearParametersForm;
-        private CreateFiscalYearCommand _fiscalYearCommand = new(0,0,0);
+        //private readonly RadzenTemplateForm<CreateFiscalYearCommand>? _fiscalYearParametersForm;
+        private CreateFiscalYearCommand _fiscalYearCommand = new(0,0,DateTime.MinValue);
         private List<CompanyLookup>? _companyLookups;
-        private List<MonthLookup> _months = MonthLookupList.Months;
-        private CompanyWithFiscalPeriodsDto _companyWithFiscalPeriods = new();
+        private FiscalYearDto? _fiscalYearDto = null;
         private int _selectedCompanyCode;
-        private DateTime _validNextFiscalYearStartDate = DateTime.MinValue;
-        private bool isLoading;
         private bool _disableFiscalYearDeleteButton = true;
+        private bool _disableGenerateFiscalYearButton = true;
+        private bool _showErrorAlert = false;
+        private string _errorAlertMessage = string.Empty;
+        private string _errorAlertTitle = string.Empty;
+        private bool _isLoading = false;
 
         protected async override Task OnInitializedAsync()
         {
             try
             {
-                Result<List<CompanyLookup>> result = await LookupService!.GetCompanyLookups();
+                Result<List<CompanyLookup>>? result = await LookupService!.GetCompanyLookups();
 
                 if (result.IsFailure)
                 {
                     Logger!.LogError("Failed to retrieve company lookups: {ERROR}.", result.Error.Message);
-
-                    ShowErrorNotification.ShowError(
-                        NotificationService!,
-                        result.Error.Message
-                    );
+                    _errorAlertTitle = "Error retrieving company lookup data";
+                    _errorAlertMessage = result.Error.Message;
+                    _showErrorAlert = true;
 
                     Navigation?.NavigateTo("/");
                 }
-
+                 
                 _companyLookups = result.Value;
                 CompanyLookup unselectedItem = new(0, "------");
                 _companyLookups.Insert(0, unselectedItem);
@@ -49,51 +48,26 @@ namespace CloudAccounting.Wasm.Pages.FiscalYear
             catch (Exception ex)
             {
                 Logger!.LogError(ex, "An exception occurred while retrieving company lookups.");
-                ShowErrorNotification.ShowError(
-                    NotificationService!,
-                    "An unexpected error occurred while retrieving company lookups."
-                );
+                _errorAlertTitle = "Error retrieving company lookup data";
+                _errorAlertMessage = "An unexpected error occurred while retrieving company lookups.";
+                _showErrorAlert = true;
 
                 Navigation?.NavigateTo("/");
             }
         }
 
-        private static bool ValidateCompanyCode(int companyCode)
-        {
-            return companyCode > 0;
-        }
-
-        private bool ValidateFiscalYearWhenPreviousFiscalYear(int fiscalYear)
-        {
-            if (fiscalYear >= _validNextFiscalYearStartDate.Year || fiscalYear < DateTime.Now.AddMonths(11).Year)
-            {
-                return true;
-            }
-
-            return false;
-        }
-
-        private bool ValidateFiscalYearWhenNoPreviousFiscalYear(int fiscalYear)
-        {
-            if (_validNextFiscalYearStartDate == DateTime.MinValue)
-            {
-                if (fiscalYear < 2000 || fiscalYear > DateTime.Now.AddMonths(11).Year)
-                {
-                    return false;
-                }
-            }
-
-            return true;
-        }
-
-        private static bool ValidateStartMonth(int monthId)
-        {
-            return monthId > 0;
-        }
-
         private async Task OnCompanyDropDownChanged(object companyCode)
         {
-            await GetFiscalYears(Convert.ToInt32(companyCode));
+            int code = Convert.ToInt32(companyCode);
+
+            if (code == 0) 
+            { 
+                _disableGenerateFiscalYearButton = true;
+            } 
+            else 
+            {
+                await GetFiscalYears(code);
+            }            
          }
 
         private async Task GetFiscalYears(int companyCode)
@@ -102,46 +76,37 @@ namespace CloudAccounting.Wasm.Pages.FiscalYear
             {
                 _selectedCompanyCode = companyCode;
 
-                Result<DateTime> validStartDateresult = await CompanyService!.GetNextValidFiscalYearStartDateAsync(_selectedCompanyCode);
-
-                if (validStartDateresult.IsFailure)
-                {
-                    Logger!.LogError("Failed to retrieve next valid fiscal year start date: {ERROR}.", validStartDateresult.Error.Message);
-
-                    ShowErrorNotification.ShowError(
-                        NotificationService!,
-                        validStartDateresult.Error.Message
-                    );
-
-                    Navigation?.NavigateTo("/");
-                }
-
-                _validNextFiscalYearStartDate = validStartDateresult.Value;
-
-                Result<CompanyWithFiscalPeriodsDto> result = await CompanyService!.GetCompanyFiscalYearAsync(_selectedCompanyCode);
+                Result<FiscalYearDto> result = await CompanyService!.GetCompanyFiscalYearAsync(_selectedCompanyCode);
 
                 if (result.IsFailure)
                 {
                     Logger!.LogError("Failed to retrieve company fiscal year info: {ERROR}.", result.Error.Message);
-
-                    ShowErrorNotification.ShowError(
-                        NotificationService!,
-                        result.Error.Message
-                    );
+                    _errorAlertTitle = "Error retrieving fiscal year information";
+                    _errorAlertMessage = result.Error.Message;
+                    _showErrorAlert = true;
 
                     Navigation?.NavigateTo("/");
                 }
 
-                _companyWithFiscalPeriods = result.Value;
-                _disableFiscalYearDeleteButton = _companyWithFiscalPeriods.FiscalPeriods.Count == 0;
+                _fiscalYearDto = result.Value;
+
+                _fiscalYearCommand = new(
+                        _fiscalYearDto.CompanyCode,
+                        _fiscalYearDto.FiscalPeriods.Count == 0 ? DateTime.Today.Year : _fiscalYearDto.Year + 1,
+                        _fiscalYearDto.FiscalPeriods.Count == 0 ? DateTime.Today : _fiscalYearDto.FiscalYearEndDate.AddDays(1)    
+                    );
+
+                _disableFiscalYearDeleteButton = _fiscalYearDto.HasTransactions || _fiscalYearDto.FiscalPeriods.Count == 0;
+                _disableGenerateFiscalYearButton = false;
+
+                await InvokeAsync(StateHasChanged);
             }
             catch (Exception ex)
             {
-                Logger!.LogError(ex, "An exception occurred while retrieving company lookups.");
-                ShowErrorNotification.ShowError(
-                    NotificationService!,
-                    "An unexpected error occurred while retrieving company lookups."
-                );
+                Logger!.LogError(ex, "An exception occurred while retrieving fiscal year information.");
+                _errorAlertTitle = "Error retrieving fiscal year information.";
+                _errorAlertMessage = "An unexpected error occurred while retrieving fiscal year information.";
+                _showErrorAlert = true;
 
                 Navigation?.NavigateTo("/");
             }
@@ -149,17 +114,19 @@ namespace CloudAccounting.Wasm.Pages.FiscalYear
 
         private async Task GetFiscalPeriods(LoadDataArgs args)
         {
+            _isLoading = true;
             await GetFiscalYears(Convert.ToInt32(_selectedCompanyCode));
+            _isLoading = false;
         }
 
         private async Task DeleteFiscalYear()
         {
-            int monthId = _companyWithFiscalPeriods.FiscalPeriods[0].MonthId;
-            int companyCode = _companyWithFiscalPeriods.CompanyCode;
-            int fiscalYear = _companyWithFiscalPeriods.FiscalYear;
-            string companyName = _companyWithFiscalPeriods.CompanyName!;
 
-            string msg = $"Do you wish to delete fiscal year {monthId}/{fiscalYear} for {companyName}? This can't be undone!";
+            int companyCode = _fiscalYearDto!.CompanyCode;
+            int fiscalYear = _fiscalYearDto.Year;
+            string companyName = _fiscalYearDto.CompanyName!;
+
+            string msg = $"Do you wish to delete fiscal year {fiscalYear} for {companyName}? This can't be undone!";
 
             var dialogResponse = await DialogService!.Confirm(msg, $"Delete fiscal year?", new ConfirmOptions() { OkButtonText = "Yes", CancelButtonText = "No" });
 
@@ -170,7 +137,7 @@ namespace CloudAccounting.Wasm.Pages.FiscalYear
 
                 if (result.IsSuccess)
                 {
-                    string successMsg = $"Successfully deleted fiscal year {monthId}/{fiscalYear} for {companyName}.";
+                    string successMsg = $"Successfully deleted fiscal year {fiscalYear} for {companyName}.";
                     
                     NotificationService!.Notify(new NotificationMessage
                     {
@@ -178,7 +145,7 @@ namespace CloudAccounting.Wasm.Pages.FiscalYear
                         Severity = NotificationSeverity.Success,
                         Summary = "Delete succeeded",
                         Detail = successMsg,
-                        Duration = 4000
+                        Duration = 5000
                     });
 
                     await GetFiscalYears(_selectedCompanyCode);
@@ -187,45 +154,77 @@ namespace CloudAccounting.Wasm.Pages.FiscalYear
                 {
                     Logger!.LogError("Failed to delete company fiscal year: {ERROR}.", result.Error.Message);
 
-                    ShowErrorNotification.ShowError(
-                        NotificationService!,
-                        result.Error.Message
-                    );
+                    _errorAlertTitle = "Error deleting fiscal year information";
+                    _errorAlertMessage = "An unexpected error occurred while deleting fiscal year information.";
+                    _showErrorAlert = true;
                 }
             }
         }
 
         private async Task Submit(CreateFiscalYearCommand arg)
         {
-            Result<CompanyWithFiscalPeriodsDto> result = await CompanyService!.CreateCompanyFiscalYearAsync(_fiscalYearCommand);
+            Result<FiscalYearDto> result = await CompanyService!.CreateCompanyFiscalYearAsync(arg);
 
             if (result.IsSuccess)
             {
-                _fiscalYearCommand = new(0, 0, 0);
+                _fiscalYearCommand = new(0, 0, DateTime.MinValue);
+                _disableGenerateFiscalYearButton = true;
 
                 NotificationService!.Notify(new NotificationMessage
                 {
                     Style = "position: absolute; inset-inline-start: -1000px;",
                     Severity = NotificationSeverity.Success,
-                    Summary = "New company created",
-                    Detail = $"Successfully created new fiscal year for {result.Value.CompanyName}.",
-                    Duration = 4000
+                    Summary = "New fiscal year created",
+                    Detail = $"Successfully created fiscal year {result.Value.Year} for {result.Value.CompanyName}.",
+                    Duration = 5000
                 });
                 
-                _companyWithFiscalPeriods = result.Value;
-                _disableFiscalYearDeleteButton = _companyWithFiscalPeriods.FiscalPeriods.Count == 0;
+                _fiscalYearDto = result.Value;
+                _disableFiscalYearDeleteButton = _fiscalYearDto.FiscalPeriods.Count == 0;
 
                 await InvokeAsync(StateHasChanged);
             }
             else
             {
                 Logger!.LogError("Failed to create fiscal year: {ERROR}.", result.Error.Message);
-
-                ShowErrorNotification.ShowError(
-                    NotificationService!,
-                    result.Error.Message
-                );
+                _errorAlertTitle = "Error creating fiscal year";
+                _errorAlertMessage = result.Error.Message;
+                _showErrorAlert = true;
             }
+        }
+
+        private static bool ValidateCompanyCode(int companyCode)
+        {
+            return companyCode > 0;
+        }
+
+        private bool ValidateFiscalYear(int fiscalYear)
+        {
+            if (_fiscalYearDto!.FiscalPeriods.Count > 0)
+            {
+                return fiscalYear > _fiscalYearDto.Year;
+            }
+
+            return true;
+        }
+
+        private bool ValidateStartDate(DateTime startDate)
+        {
+            if (_fiscalYearDto!.FiscalPeriods.Count > 0)
+            {
+                return startDate > _fiscalYearDto.FiscalYearEndDate;
+            }
+            else
+            {
+                return startDate > DateTime.MinValue;
+            }
+        }
+
+        private void OnAlertClose()
+        {
+            _showErrorAlert = false;
+            _errorAlertMessage = string.Empty;
+            _errorAlertTitle = string.Empty;
         }
 
     }

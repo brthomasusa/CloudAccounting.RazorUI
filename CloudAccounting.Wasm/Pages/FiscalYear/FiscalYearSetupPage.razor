@@ -4,12 +4,12 @@
 
 <PageTitle>Fiscal Year Setup</PageTitle>
 
-<RadzenText TextStyle="TextStyle.Subtitle1">Create and View company fiscal year information</RadzenText>
+<RadzenText TextStyle="TextStyle.Subtitle1">Manage Company Fiscal Year Information</RadzenText>
 
 <ErrorBoundary>
     <ChildContent>
         <RadzenCard Variant="Variant.Outlined" class="rz-p-0 rz-m-0">
-            <RadzenTemplateForm @key="@_fiscalYearCommand" Data="@_fiscalYearCommand" Submit="@(async (CreateFiscalYearCommand args) => { await Submit(args); })">
+            <RadzenTemplateForm Data="@_fiscalYearCommand" Submit="@(async (CreateFiscalYearCommand args) => { await Submit(args); })">
                 <div class="container">
                     <div class="row align-items-center">
                         <div class="col">
@@ -45,38 +45,31 @@
                                                Placeholder="Enter fiscal year" />
                                 <RadzenCustomValidator 
                                     Component="fiscalYearInput" 
-                                                       Validator="@(() => ValidateFiscalYearWhenPreviousFiscalYear(_fiscalYearCommand.FiscalYear))"
-                                    Text="Fiscal year can not start before last day of previous fiscal year or after a year from today." 
+                                                       Validator="@(() => ValidateFiscalYear(_fiscalYearCommand.FiscalYear))"
+                                    Text="Fiscal year must be greater than any previous fiscal year." 
                                     Popup="true" />
-                                <RadzenCustomValidator Component="fiscalYearInput"
-                                                       Validator="@(() => ValidateFiscalYearWhenNoPreviousFiscalYear(_fiscalYearCommand.FiscalYear))"
-                                                       Text="Fiscal year can not start before 2000 or after a year from today."
-                                                       Popup="true" />
                             </RadzenStack>
                         </div>
                         <div class="col">
                             <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.Center" Gap="0.5rem" class="rz-p-sm-12">
-                                <RadzenLabel Style="width: 150px;" Component="monthDropDown">
-                                    <span style="color: red;">*</span> Start Month
+                                <RadzenLabel Style="width: 150px;" Component="startDate">
+                                    <span style="color: red;">*</span> Start Date
                                 </RadzenLabel>
-                                @if (_months is not null)
-                                {
-                                    <RadzenDropDown @bind-Value=@_fiscalYearCommand.StartMonthNumber
-                                                    Data=@_months
-                                                    TextProperty="@nameof(MonthLookup.MonthName)"
-                                                    ValueProperty="@nameof(MonthLookup.MonthId)"
-                                                    Style="width: 100%; max-width: 400px;"
-                                                    Name="monthDropDown" />
-                                    <RadzenCustomValidator 
-                                        Component="monthDropDown" 
-                                        Validator="@(() => ValidateStartMonth(_fiscalYearCommand.StartMonthNumber))" 
-                                        Text="Select fiscal year start month." 
-                                        Popup="true" />
-                                }
+                                <RadzenDatePicker @bind-Value=@_fiscalYearCommand.StartDate Name="startDate" ShowCalendarWeek />
+                                <RadzenCustomValidator Component="startDate"
+                                                       Validator="@(() => ValidateStartDate(_fiscalYearCommand.StartDate))"
+                                                       Text="Start date must be greater than the end date of the last fiscal year."
+                                                       Popup="true" />
                             </RadzenStack>
                         </div>
                         <div class="col">
-                            <RadzenButton ButtonType="ButtonType.Submit" ButtonStyle="ButtonStyle.Success" Size="ButtonSize.Medium" Icon="save" Text="Generate Fiscal Year" />
+                            <RadzenButton 
+                                ButtonType="ButtonType.Submit" 
+                                ButtonStyle="ButtonStyle.Success" 
+                                Size="ButtonSize.Medium" 
+                                Icon="save"
+                                Disabled="@_disableGenerateFiscalYearButton"
+                                Text="Generate Fiscal Year" />
                         </div>
                     </div>
                 </div>
@@ -84,83 +77,95 @@
         </RadzenCard>
 
         <RadzenCard Variant="Variant.Outlined" class="rz-p-0 rz-m-0 rz-mt-7">
-            <div class="container">
-                <div class="row align-items-center mt-4">
-                    <div class="col">
-                        <RadzenStack Orientation="Orientation.Horizontal" Gap="0.5rem">
-                            <RadzenLabel class="rz-m-0" Text="Company Name" TextStyle="TextStyle.Subtitle2" Style="width: 150px;" Component="companyNameInput" />
-                            <RadzenTextBox Name="companyNameInput" @bind-Value=@_companyWithFiscalPeriods.CompanyName ReadOnly />
-                        </RadzenStack>
+            @if (_fiscalYearDto is not null)
+            {
+                <div class="container">
+                    <div class="row align-items-center mt-4">
+                        <div class="col">
+                            <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.Center"  Gap="0.5rem">
+                                <RadzenLabel class="rz-m-0" Text="Company Name" TextStyle="TextStyle.Subtitle2" Style="width: 150px;" Component="companyNameInput" />
+                                <RadzenTextBox Name="companyNameInput" value=@_fiscalYearDto!.CompanyName ReadOnly />
+                            </RadzenStack>
+                        </div>
+                        <div class="col">
+                            <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.Center" Gap="0.5rem">
+                                <RadzenLabel class="rz-m-0" Text="Fiscal Year" TextStyle="TextStyle.Subtitle2" Style="width: 150px;" Component="fiscalYearInput" />
+                                <RadzenNumeric TValue="int" Name="fiscalYearInput" value=@_fiscalYearDto!.Year ReadOnly />
+                            </RadzenStack>
+                        </div>
+                        <div class="col">
+                            <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.Center" Gap="0.5rem">
+                                <RadzenCheckBox TValue="bool" value=@_fiscalYearDto!.IsInitialFiscalYear Name="isInitYearCheckBox" ReadOnly />
+                                <RadzenLabel Text="Initial Year?" Component="isInitYearCheckBox" />
+                            </RadzenStack>
+                        </div>
+                        <div class="col">
+                            <RadzenButton ButtonStyle="ButtonStyle.Danger"
+                                          Size="ButtonSize.Medium"
+                                          Icon="delete"
+                                          Text="Delete Fiscal Year"
+                                          Disabled="@_disableFiscalYearDeleteButton"
+                                          Click="@DeleteFiscalYear" />
+                        </div>
                     </div>
-                    <div class="col">
-                        <RadzenStack Orientation="Orientation.Horizontal" Gap="0.5rem">
-                            <RadzenLabel class="rz-m-0" Text="Fiscal Year" TextStyle="TextStyle.Subtitle2" Style="width: 150px;" Component="fiscalYearInput" />
-                            <RadzenNumeric Name="fiscalYearInput" @bind-Value=@_companyWithFiscalPeriods.FiscalYear ReadOnly />
-                        </RadzenStack>
-                    </div>
-                    <div class="col">
-                        <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0.5rem">
-                            <RadzenCheckBox @bind-Value=@_companyWithFiscalPeriods.IsInitialYear Name="isInitYearCheckBox" ReadOnly />
-                            <RadzenLabel Text="Initial Year?" Component="isInitYearCheckBox" />
-                        </RadzenStack>
-                    </div>
-                    <div class="col">
-                        <RadzenButton 
-                            ButtonStyle="ButtonStyle.Danger" 
-                            Size="ButtonSize.Medium" 
-                            Icon="delete" 
-                            Text="Delete Fiscal Year" 
-                            Disabled="@_disableFiscalYearDeleteButton"
-                            Click="@DeleteFiscalYear" />
-                    </div>
-                </div>
-                <hr />
-                <div class="row mt-5 mb-4">
-                    <div class="col">
-                        @if (_companyWithFiscalPeriods is null)
-                        {
-                            <LoadingIndicator />
-                        }
-                        else
-                        {
-                            <ErrorBoundary>
-                                <ChildContent>
-                                    <RadzenDataGrid TItem="FiscalPeriodDto" GridLines="DataGridGridLines.Horizontal"
-                                        Data="@(_companyWithFiscalPeriods.FiscalPeriods)" 
-                                        IsLoading="@isLoading"
-                                        LoadData="@GetFiscalPeriods" 
-                                        Count="@(_companyWithFiscalPeriods.FiscalPeriods!.Count)"
-                                        Density="Density.Compact" 
-                                        AllowAlternatingRows="true">                                                    
+                    <hr />
+                    <div class="row mt-5 mb-4">
+                        <div class="col">
+                            @if (_fiscalYearDto is null)
+                            {
+                                <LoadingIndicator />
+                            }
+                            else
+                            {
+                                <ErrorBoundary>
+                                    <ChildContent>
+                                        <RadzenDataGrid TItem="FiscalPeriodDto" GridLines="DataGridGridLines.Horizontal"
+                                                        Data="@(_fiscalYearDto.FiscalPeriods)"
+                                                        IsLoading="@_isLoading"
+                                                        LoadData="@GetFiscalPeriods"
+                                                        Count="@(_fiscalYearDto.FiscalPeriods!.Count)"
+                                                        Density="Density.Compact"
+                                                        AllowAlternatingRows="true">
                                                     
-                                        <Columns>
-                                            <RadzenDataGridColumn TItem="FiscalPeriodDto" Property="MonthId" Title="Period"
-                                                                  Filterable="false" Width="20px" />
-                                            <RadzenDataGridColumn TItem="FiscalPeriodDto" Property="MonthName" Title="Month"
-                                                                  Filterable="false" Width="100px" />
-                                            <RadzenDataGridColumn TItem="FiscalPeriodDto" Property="StartDate" Title="Start"
-                                                                  Filterable="false" Width="100px" FormatString="{0:d}" />
-                                            <RadzenDataGridColumn TItem="FiscalPeriodDto" Property="EndDate" Title="End"
-                                                                  Filterable="false" Width="100px" FormatString="{0:d}" />
-                                            <RadzenDataGridColumn TItem="FiscalPeriodDto" Property="PeriodClosed" Title="Period Closed?"
-                                                                  Filterable="false" Width="100px">
-                                                <Template Context="data">
-                                                    @(data.PeriodClosed ? "Yes" : "No")
-                                                </Template>
-                                            </RadzenDataGridColumn>
-                                        </Columns>
-                                    </RadzenDataGrid>
-                                </ChildContent>
-                                <ErrorContent Context="ex">
-                                    <!-- Fallback UI when an error occurs -->
-                                    <p class="errorUI">An error has occurred: @ex.Message</p>
-                                </ErrorContent>
-                            </ErrorBoundary>
-                        }
+                                            <Columns>
+                                                <RadzenDataGridColumn TItem="FiscalPeriodDto" Property="MonthId" Title="Period"
+                                                                      Filterable="false" Width="20px" />
+                                                <RadzenDataGridColumn TItem="FiscalPeriodDto" Property="MonthName" Title="Month"
+                                                                      Filterable="false" Width="100px" />
+                                                <RadzenDataGridColumn TItem="FiscalPeriodDto" Property="StartDate" Title="Start"
+                                                                      Filterable="false" Width="100px" FormatString="{0:d}" />
+                                                <RadzenDataGridColumn TItem="FiscalPeriodDto" Property="EndDate" Title="End"
+                                                                      Filterable="false" Width="100px" FormatString="{0:d}" />
+                                                <RadzenDataGridColumn TItem="FiscalPeriodDto" Property="PeriodClosed" Title="Period Closed?"
+                                                                      Filterable="false" Width="100px">
+                                                    <Template Context="data">
+                                                        @(data.PeriodClosed ? "Yes" : "No")
+                                                    </Template>
+                                                </RadzenDataGridColumn>
+                                            </Columns>
+                                        </RadzenDataGrid>
+                                    </ChildContent>
+                                    <ErrorContent Context="ex">
+                                        <!-- Fallback UI when an error occurs -->
+                                        <p class="errorUI">An error has occurred: @ex.Message</p>
+                                    </ErrorContent>
+                                </ErrorBoundary>
+                            }
+                        </div>
                     </div>
                 </div>
-            </div>
-        </RadzenCard>               
+            }           
+        </RadzenCard>
+        <RadzenAlert 
+            Visible="@_showErrorAlert" 
+            Title="@_errorAlertTitle"
+            AlertStyle="AlertStyle.Danger" 
+            Variant="Variant.Flat" 
+            Shade="Shade.Lighter" 
+            AllowClose="true" 
+            Close="@OnAlertClose">
+            @_errorAlertMessage
+        </RadzenAlert>
     </ChildContent>
     <ErrorContent Context="ex">
         <p class="errorUI">An error has occurred: @ex.Message</p>

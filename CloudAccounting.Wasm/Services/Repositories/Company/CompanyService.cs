@@ -43,14 +43,6 @@ namespace CloudAccounting.Wasm.Services.Repositories.Company
                     new Error("CompanyService.GetCompanyByIdAsync", Helpers.GetExceptionMessage(e))
                 );
             }
-            catch (TaskCanceledException e)
-            {
-                _logger!.LogError("CompanyService.GetCompanyByIdAsync: Request timed out or was canceled: {errMsg}", e.Message);
-
-                return Result<CompanyDetail>.Failure<CompanyDetail>(
-                    new Error("CompanyService.GetCompanyByIdAsync", Helpers.GetExceptionMessage(e))
-                );
-            }
             catch (Exception ex)
             {
                 string errMsg = Helpers.GetExceptionMessage(ex);
@@ -93,14 +85,6 @@ namespace CloudAccounting.Wasm.Services.Repositories.Company
                     new Error("CompanyService.GetCompaniesAsync", Helpers.GetExceptionMessage(e))
                 );
             }
-            catch (TaskCanceledException e)
-            {
-                _logger!.LogError("CompanyService.GetCompaniesAsync: Request timed out or was canceled: {errMsg}", e.Message);
-
-                return Result<List<CompanyDetail>>.Failure<List<CompanyDetail>>(
-                    new Error("CompanyService.GetCompaniesAsync", Helpers.GetExceptionMessage(e))
-                );
-            }
             catch (Exception ex)
             {
                 string errMsg = Helpers.GetExceptionMessage(ex);
@@ -133,14 +117,6 @@ namespace CloudAccounting.Wasm.Services.Repositories.Company
 
                 return Result<CompanyDetail>.Failure<CompanyDetail>(
                     new Error("CompanyService.UpdateCompanyAsync", Helpers.GetExceptionMessage(e))
-                );
-            }
-            catch (TaskCanceledException e)
-            {
-                _logger!.LogError("CompanyService.CreateCompanyAsync: Request timed out or was canceled: {errMsg}", e.Message);
-
-                return Result<CompanyDetail>.Failure<CompanyDetail>(
-                    new Error("CompanyService.CreateCompanyAsync", e.Message)
                 );
             }
             catch (Exception ex)
@@ -176,12 +152,6 @@ namespace CloudAccounting.Wasm.Services.Repositories.Company
                 return Result<CompanyDetail>.Failure<CompanyDetail>(
                     new Error("CompanyService.UpdateCompanyAsync", Helpers.GetExceptionMessage(e))
                 );
-            }
-            catch (TaskCanceledException e)
-            {
-                _logger!.LogError("CompanyService.UpdateCompanyAsync: Request timed out or was canceled: {errMsg}", e.Message);
-
-                return Result.Failure(new Error("CompanyService.UpdateCompanyAsync", e.Message));
             }
             catch (Exception ex)
             {
@@ -226,12 +196,6 @@ namespace CloudAccounting.Wasm.Services.Repositories.Company
                     new Error("CompanyService.DeleteCompanyAsync", Helpers.GetExceptionMessage(e))
                 );
             }
-            catch (TaskCanceledException e)
-            {
-                _logger!.LogError("CompanyService.DeleteCompanyAsync: Request timed out or was canceled: {errMsg}", e.Message);
-
-                return Result.Failure(new Error("CompanyService.DeleteCompanyAsync", e.Message));
-            }
             catch (Exception ex)
             {
                 string errMsg = Helpers.GetExceptionMessage(ex);
@@ -241,76 +205,110 @@ namespace CloudAccounting.Wasm.Services.Repositories.Company
             }
         }
 
-        public async Task<Result<CompanyWithFiscalPeriodsDto>> GetCompanyFiscalYearAsync(int companyCode)
+        public async Task<Result<FiscalYearDto>> GetCompanyFiscalYearAsync(int companyCode)
         {
             try
             {
-                HttpResponseMessage response = await _httpClient.GetAsync($"{relativePath}/fiscalyear/{companyCode}");
+                HttpResponseMessage response = await _httpClient.GetAsync($"/api/v1/fiscalyears/{companyCode}");
 
                 response.EnsureSuccessStatusCode();
 
-                return await response.Content.ReadFromJsonAsync<CompanyWithFiscalPeriodsDto>();
+                return await response.Content.ReadFromJsonAsync<FiscalYearDto>();
             }
             catch (HttpRequestException e) when (e.StatusCode == System.Net.HttpStatusCode.NotFound)
             {
                 string msg = $"A company with company code {companyCode} was not found.";
 
-                _logger!.LogWarning("CompanyService.GetCompanyByIdAsync: {message}", msg);
+                _logger!.LogWarning("CompanyService.GetCompanyFiscalYearAsync: {message}", msg);
 
-                return Result<CompanyWithFiscalPeriodsDto>.Failure<CompanyWithFiscalPeriodsDto>(
-                    new Error("CompanyService.GetCompanyByIdAsync", msg)
+                return Result<FiscalYearDto>.Failure<FiscalYearDto>(
+                    new Error("CompanyService.GetCompanyFiscalYearAsync", msg)
                 );
             }
             catch (HttpRequestException e)
             {
                 if (e.StatusCode.HasValue)
                 {
-                    _logger!.LogError("CompanyService.GetCompanyDtoWithoutFiscalYearAsync: Status Code: {statusCode}", e.StatusCode.Value);
+                    _logger!.LogError("CompanyService.GetCompanyFiscalYearAsync: Status Code: {statusCode}", e.StatusCode.Value);
                 }
 
-                return Result<CompanyWithFiscalPeriodsDto>.Failure<CompanyWithFiscalPeriodsDto>(
-                    new Error("CompanyService.GetCompanyDtoWithoutFiscalYearAsync", Helpers.GetExceptionMessage(e))
-                );
-            }
-            catch (TaskCanceledException e)
-            {
-                _logger!.LogError("CompanyService.GetCompanyDtoWithoutFiscalYearAsync: Request timed out or was canceled: {errMsg}", e.Message);
-
-                return Result<CompanyWithFiscalPeriodsDto>.Failure<CompanyWithFiscalPeriodsDto>(
-                    new Error("CompanyService.GetCompanyDtoWithoutFiscalYearAsync", Helpers.GetExceptionMessage(e))
+                return Result<FiscalYearDto>.Failure<FiscalYearDto>(
+                    new Error("CompanyService.GetCompanyFiscalYearAsync", Helpers.GetExceptionMessage(e))
                 );
             }
             catch (Exception ex)
             {
                 string errMsg = Helpers.GetExceptionMessage(ex);
-                _logger!.LogError("CompanyService.GetCompanyDtoWithoutFiscalYearAsync: {errMsg}", errMsg);
+                _logger!.LogError("CompanyService.GetCompanyFiscalYearAsync: {errMsg}", errMsg);
 
-                return Result<CompanyWithFiscalPeriodsDto>.Failure<CompanyWithFiscalPeriodsDto>(
-                    new Error("CompanyService.GetCompanyDtoWithoutFiscalYearAsync", errMsg)
+                return Result<FiscalYearDto>.Failure<FiscalYearDto>(
+                    new Error("CompanyService.GetCompanyFiscalYearAsync", errMsg)
                 );
             }
         }
 
-        public async Task<Result<CompanyWithFiscalPeriodsDto>> CreateCompanyFiscalYearAsync(CreateFiscalYearCommand command)
+        public async Task<Result<FiscalYearDto>> GetCompanyFiscalYearAsync(int companyCode, int fiscalYear)
         {
             try
             {
-                var jsonCompany = JsonSerializer.Serialize(command);
-                var requestContent = new StringContent(jsonCompany, Encoding.UTF8, "application/json");
-                using HttpResponseMessage response = await _httpClient.PostAsync($"{relativePath}/fiscalyear", requestContent);
+                HttpResponseMessage response = await _httpClient.GetAsync($"/api/v1/fiscalyears/{companyCode}/{fiscalYear}");
+
+                response.EnsureSuccessStatusCode();
+
+                return await response.Content.ReadFromJsonAsync<FiscalYearDto>();
+            }
+            catch (HttpRequestException e) when (e.StatusCode == System.Net.HttpStatusCode.NotFound)
+            {
+                string msg = $"A company with company code {companyCode} was not found.";
+
+                _logger!.LogWarning("CompanyService.GetCompanyFiscalYearAsync: {message}", msg);
+
+                return Result<FiscalYearDto>.Failure<FiscalYearDto>(
+                    new Error("CompanyService.GetCompanyFiscalYearAsync", msg)
+                );
+            }
+            catch (HttpRequestException e)
+            {
+                if (e.StatusCode.HasValue)
+                {
+                    _logger!.LogError("CompanyService.GetCompanyFiscalYearAsync: Status Code: {statusCode}", e.StatusCode.Value);
+                }
+
+                return Result<FiscalYearDto>.Failure<FiscalYearDto>(
+                    new Error("CompanyService.GetCompanyFiscalYearAsync", Helpers.GetExceptionMessage(e))
+                );
+            }
+            catch (Exception ex)
+            {
+                string errMsg = Helpers.GetExceptionMessage(ex);
+                _logger!.LogError("CompanyService.GetCompanyFiscalYearAsync: {errMsg}", errMsg);
+
+                return Result<FiscalYearDto>.Failure<FiscalYearDto>(
+                    new Error("CompanyService.GetCompanyFiscalYearAsync", errMsg)
+                );
+            }
+        }
+
+        public async Task<Result<FiscalYearDto>> CreateCompanyFiscalYearAsync(CreateFiscalYearCommand command)
+        {
+            try
+            {
+                var jsonFiscalYear = JsonSerializer.Serialize(command);
+                var requestContent = new StringContent(jsonFiscalYear, Encoding.UTF8, "application/json");
+                using HttpResponseMessage response = await _httpClient.PostAsync($"/api/v1/fiscalyears", requestContent);
                 response.EnsureSuccessStatusCode();
 
                 var content = await response.Content.ReadAsStringAsync();
 
-                return await response.Content.ReadFromJsonAsync<CompanyWithFiscalPeriodsDto>();
+                return await response.Content.ReadFromJsonAsync<FiscalYearDto>();
             }
             catch (HttpRequestException e) when (e.StatusCode == System.Net.HttpStatusCode.BadRequest)
             {
-                string msg = $"Failed to create new fiscal year {command.FiscalYear} with starting month {command.StartMonthNumber}.";
+                string msg = $"Failed to create new fiscal year {command.FiscalYear} with starting date {command.StartDate}.";
 
                 _logger!.LogError("CompanyService.GetCompanyByIdAsync: {message}", msg);
 
-                return Result<CompanyWithFiscalPeriodsDto>.Failure<CompanyWithFiscalPeriodsDto>(
+                return Result<FiscalYearDto>.Failure<FiscalYearDto>(
                     new Error("CompanyService.CreateCompanyFiscalYearAsync", msg)
                 );
             }
@@ -321,15 +319,7 @@ namespace CloudAccounting.Wasm.Services.Repositories.Company
                     _logger!.LogError("CompanyService.GetCompanyDtoWithoutFiscalYearAsync: Status Code: {statusCode}", e.StatusCode.Value);
                 }
 
-                return Result<CompanyWithFiscalPeriodsDto>.Failure<CompanyWithFiscalPeriodsDto>(
-                    new Error("CompanyService.CreateCompanyFiscalYearAsync", Helpers.GetExceptionMessage(e))
-                );
-            }
-            catch (TaskCanceledException e)
-            {
-                _logger!.LogError("CompanyService.GetCompanyDtoWithoutFiscalYearAsync: Request timed out or was canceled: {errMsg}", e.Message);
-
-                return Result<CompanyWithFiscalPeriodsDto>.Failure<CompanyWithFiscalPeriodsDto>(
+                return Result<FiscalYearDto>.Failure<FiscalYearDto>(
                     new Error("CompanyService.CreateCompanyFiscalYearAsync", Helpers.GetExceptionMessage(e))
                 );
             }
@@ -338,49 +328,8 @@ namespace CloudAccounting.Wasm.Services.Repositories.Company
                 string errMsg = Helpers.GetExceptionMessage(ex);
                 _logger!.LogError("CompanyService.CreateCompanyFiscalYearAsync: {errMsg}", errMsg);
 
-                return Result<CompanyWithFiscalPeriodsDto>.Failure<CompanyWithFiscalPeriodsDto>(
+                return Result<FiscalYearDto>.Failure<FiscalYearDto>(
                     new Error("CompanyService.CreateCompanyFiscalYearAsync", errMsg)
-                );
-            }
-
-        }
-
-        public async Task<Result<DateTime>> GetNextValidFiscalYearStartDateAsync(int companyCode)
-        {
-            try
-            {
-                HttpResponseMessage response = await _httpClient.GetAsync($"{relativePath}/validstartdate/{companyCode}");
-
-                response.EnsureSuccessStatusCode();
-
-                return await response.Content.ReadFromJsonAsync<DateTime>();
-            }
-            catch (HttpRequestException e)
-            {
-                if (e.StatusCode.HasValue)
-                {
-                    _logger!.LogError("CompanyService.GetCompanyDtoWithoutFiscalYearAsync: Status Code: {statusCode}", e.StatusCode.Value);
-                }
-
-                return Result<DateTime>.Failure<DateTime>(
-                    new Error("CompanyService.GetNextValidFiscalYearStartDateAsync", Helpers.GetExceptionMessage(e))
-                );
-            }
-            catch (TaskCanceledException e)
-            {
-                _logger!.LogError("CompanyService.GetCompanyDtoWithoutFiscalYearAsync: Request timed out or was canceled: {errMsg}", e.Message);
-
-                return Result<DateTime>.Failure<DateTime>(
-                    new Error("CompanyService.GetNextValidFiscalYearStartDateAsync", Helpers.GetExceptionMessage(e))
-                );
-            }
-            catch (Exception ex)
-            {
-                string errMsg = Helpers.GetExceptionMessage(ex);
-                _logger!.LogError("CompanyService.GetNextValidFiscalYearStartDateAsync: {errMsg}", errMsg);
-
-                return Result<DateTime>.Failure<DateTime>(
-                    new Error("CompanyService.GetCompanyDtoWithoutFiscalYearAsync", errMsg)
                 );
             }
         }
@@ -389,7 +338,7 @@ namespace CloudAccounting.Wasm.Services.Repositories.Company
         {
             try
             {
-                string uri = $"{relativePath}/fiscalyear";
+                string uri = $"/api/v1/fiscalyears";
                 DeleteFiscalYearCommand command = new(companyCode, fiscalYear);
 
                 var memStream = new MemoryStream();
@@ -416,11 +365,6 @@ namespace CloudAccounting.Wasm.Services.Repositories.Company
                     _logger!.LogError("CompanyService.DeleteCompanyFiscalYearAsync: Status Code: {statusCode}", e.StatusCode.Value);
                 }
                 return Result.Failure(new Error("CompanyService.DeleteCompanyFiscalYearAsync", Helpers.GetExceptionMessage(e)));
-            }
-            catch (TaskCanceledException e)
-            {
-                _logger!.LogError("CompanyService.DeleteCompanyFiscalYearAsync: Request timed out or was canceled: {errMsg}", e.Message);
-                return Result.Failure(new Error("CompanyService.DeleteCompanyFiscalYearAsync", e.Message));
             }
             catch (Exception ex)
             {

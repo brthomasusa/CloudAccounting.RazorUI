@@ -9,3 +9,4 @@
         public bool PeriodClosed { get; set; }
     }
 }
+
