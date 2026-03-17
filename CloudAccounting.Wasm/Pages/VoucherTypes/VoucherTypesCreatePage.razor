@@ -1,0 +1,97 @@
+﻿@page "/Pages/VoucherTypes/VoucherTypesCreatePage"
+@using CloudAccounting.Wasm.Components
+@using CloudAccounting.Wasm.Models.VoucherTypes
+@using Radzen
+
+<PageTitle>Create Voucher Type</PageTitle>
+
+<RadzenText TextStyle="TextStyle.Subtitle1">Create voucher type</RadzenText>
+
+<ErrorBoundary>
+    <ChildContent>
+        @if (_voucherTypeCmd == null)
+        {
+            <LoadingIndicator />
+        }
+        else
+        {
+            <NavigationLock OnBeforeInternalNavigation="OnBeforeInternalNavigation" ConfirmExternalNavigation="_hasUnsavedChanges" />
+
+            <RadzenTemplateForm TItem="VoucherTypeCommand" Data="@_voucherTypeCmd" Submit="@(async (VoucherTypeCommand args) => { await Submit(args); })">
+                <RadzenRow Gap="2rem" class="rz-p-0 rz-p-lg-4">
+                    <RadzenColumn Size="12" SizeMD="8">
+                        <RadzenStack Gap="1rem">
+                            <RadzenStack Orientation="Orientation.Vertical" Gap="0.5rem">
+                                <RadzenLabel Component="voucherTypeInput">
+                                    Voucher Type <span style="color: var(--rz-danger);">*</span>
+                                </RadzenLabel>
+                                    
+                                <RadzenTextBox Name="voucherTypeInput"
+                                               @bind-Value=@_voucherTypeCmd.VoucherType
+                                               Placeholder="Enter voucher type"
+                                               @oninput="@(e => _hasUnsavedChanges = true)" />
+                                <RadzenRequiredValidator Component="voucherTypeInput" Text="Missing voucher type" Popup="true" Style="position: absolute" />
+                                <RadzenLengthValidator Component="voucherTypeInput" Max="6" Text="Voucher type should be at most 6 characters" Popup=true Style="position: absolute" />
+                            </RadzenStack>
+
+                            <RadzenStack Orientation="Orientation.Vertical" Gap="0.5rem">
+                                <RadzenLabel Component="voucherTitleInput">
+                                    Voucher Title <span style="color: var(--rz-danger);">*</span>
+                                </RadzenLabel>
+                                <RadzenTextBox Name="voucherTitleInput"
+                                               @bind-Value=@_voucherTypeCmd.VoucherTitle
+                                               Placeholder="Enter voucher title"
+                                               @oninput="@(e => _hasUnsavedChanges = true)" />
+                                <RadzenRequiredValidator Component="voucherTitleInput" Text="Missing city name" Popup="true" Style="position: absolute" />
+                                <RadzenLengthValidator Component="voucherTitleInput" Max="30" Text="Voucher type should be at most 30 characters" Popup=true Style="position: absolute" />
+                            </RadzenStack>
+
+                            <RadzenStack Orientation="Orientation.Horizontal">
+                                <RadzenLabel Style="width: 150px;" Component="voucherClassificationDropDown">
+                                    <span style="color: red;">*</span> Voucher Classification
+                                </RadzenLabel>
+                                @if (_voucherTypeClassifications is not null)
+                                {
+                                    <RadzenDropDown @bind-Value=@_voucherTypeCmd.VoucherClassification
+                                                    Data=@_voucherTypeClassifications
+                                                    TValue="byte"
+                                                    TextProperty="@nameof(VoucherTypeClassification.ClassificationName)"
+                                                    ValueProperty="@nameof(VoucherTypeClassification.Classification)"
+                                                    Style="width: 100%; max-width: 500px"
+                                                    Placeholder="Select..."
+                                                    Name="voucherClassificationDropDown" />
+                                    <RadzenCustomValidator Component="voucherClassificationDropDown"
+                                                    Validator="@(() => ValidateVoucherClassification(_voucherTypeCmd.VoucherClassification))"
+                                                    Text="Please select classification."
+                                                    Popup="true" />
+                                }
+                            </RadzenStack>
+
+                        </RadzenStack>
+                    </RadzenColumn>
+                </RadzenRow>
+                <RadzenRow AlignItems="AlignItems.Center">
+                    <RadzenColumn Size="6" class="rz-text-align-start">
+                        <RadzenButton class="rz-mr-4" ButtonStyle="ButtonStyle.Light" Variant="Variant.Flat" Size="ButtonSize.Medium" Icon="cancel" Text="Cancel" Click="@Cancel" />
+                    </RadzenColumn>
+                    <RadzenColumn Size="6" class="rz-text-align-end">
+                        <RadzenButton ButtonType="ButtonType.Submit" ButtonStyle="ButtonStyle.Success" Size="ButtonSize.Medium" Icon="save" Text="Save" />
+                    </RadzenColumn>
+                </RadzenRow>
+            </RadzenTemplateForm>
+        }
+        <RadzenAlert Visible="@_showErrorAlert"
+                     Title="@_errorAlertTitle"
+                     AlertStyle="AlertStyle.Danger"
+                     Variant="Variant.Flat"
+                     Shade="Shade.Lighter"
+                     AllowClose="true"
+                     Close="@OnAlertClose">
+            @_errorAlertMessage
+        </RadzenAlert>
+    </ChildContent>
+    <ErrorContent Context="ex">
+        <p class="errorUI">An error has occurred: @ex.Message</p>
+    </ErrorContent>
+</ErrorBoundary>
+

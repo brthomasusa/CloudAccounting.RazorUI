@@ -1,6 +1,5 @@
 ﻿using CloudAccounting.Wasm.Services.Repositories.Company;
 using Microsoft.AspNetCore.Components.Routing;
-using Polly;
 using Radzen.Blazor;
 using System.Collections.ObjectModel;
 

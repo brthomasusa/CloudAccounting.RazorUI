@@ -6,6 +6,7 @@ using Polly;
 using Polly.Extensions.Http;
 using CloudAccounting.Wasm;
 using CloudAccounting.Wasm.Services.Repositories.Company;
+using CloudAccounting.Wasm.Services.Repositories.VoucherTypes;
 
 var builder = WebAssemblyHostBuilder.CreateDefault(args);
 builder.RootComponents.Add<App>("#app");
@@ -22,14 +23,15 @@ builder.Services.AddHttpClient("CloudAccountingApi", client =>
 
 builder.Services.AddScoped(sp => sp.GetRequiredService<IHttpClientFactory>().CreateClient("CloudAccountingApi"));
 
-builder.Services.AddScoped<ICompanyService, CompanyService>();
-builder.Services.AddScoped<ILookupService, LookupService>();
+builder.Services.AddScoped<ICompanyService, CompanyService>()
+                .AddScoped<IVoucherTypeService, VoucherTypeService>()
+                .AddScoped<ILookupService, LookupService>();
 
-builder.Services.AddRadzenComponents();
-builder.Services.AddScoped<DialogService>();
-builder.Services.AddScoped<NotificationService>();
-builder.Services.AddScoped<TooltipService>();
-builder.Services.AddScoped<ContextMenuService>();
+builder.Services.AddRadzenComponents()
+                .AddScoped<DialogService>()
+                .AddScoped<NotificationService>()
+                .AddScoped<TooltipService>()
+                .AddScoped<ContextMenuService>();
 
 await builder.Build().RunAsync();
 

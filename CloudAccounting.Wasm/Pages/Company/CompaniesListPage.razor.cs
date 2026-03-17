@@ -5,7 +5,6 @@ namespace CloudAccounting.Wasm.Pages.Company
     public partial class CompaniesListPage
     {
         [Inject] private ICompanyService? CompanyService { get; set; }
-        [Inject] public DialogService? DialogService { get; set; }
         [Inject] private NotificationService? NotificationService { get; set; }
         [Inject] private NavigationManager? Navigation { get; set; }        
         [Inject] private ILogger<CompaniesListPage>? Logger { get; set; }
@@ -33,8 +32,6 @@ namespace CloudAccounting.Wasm.Pages.Company
 
                 _companies = result.Value;
 
-                // TODO: Remove log statement or change to Debug level
-                Logger!.LogInformation("OnInitializedAsync -> Successfully retrieved {COUNT} companies.", _companies?.Count);
                 await base.OnInitializedAsync();
             }
             catch (Exception ex) 

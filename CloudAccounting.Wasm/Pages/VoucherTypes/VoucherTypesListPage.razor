@@ -1,6 +1,72 @@
 ﻿@page "/Pages/VoucherTypes/VoucherTypesListPage"
 @using CloudAccounting.Wasm.Components
+@using CloudAccounting.Wasm.Models.VoucherTypes
 
 <PageTitle>Voucher Types</PageTitle>
 
-<RadzenText TextStyle="TextStyle.Subtitle1">Voucher Types</RadzenText>
+<RadzenStack Gap="1rem" Orientation="Orientation.Vertical" JustifyContent="JustifyContent.SpaceBetween"
+             Style="height: 100%;">
+    <RadzenRow>
+        <RadzenColumn Size="12" class="rz-p-4 rz-border-radius-1" Style="border: var(--rz-grid-cell-border)">
+            @if (_voucherTypes is null || _voucherTypes!.Count() == 0)
+            {
+                <LoadingIndicator />
+            }
+            else
+            {
+                <ErrorBoundary>
+                    <ChildContent>
+                        <RadzenRow AlignItems="AlignItems.Center">
+                            <RadzenColumn Size="6">
+                                <RadzenText TextStyle="TextStyle.Subtitle1">Manage Voucher Types</RadzenText>
+                            </RadzenColumn>
+                            <RadzenColumn Size="6" class="rz-text-align-right">
+                                <RadzenButton Click="() => GoToCreateVoucherTypePage()" Icon="add_circle"
+                                              Size="ButtonSize.Medium" class="rz-border-radius-10 rz-shadow-6 rz-mb-4"
+                                              ButtonStyle="ButtonStyle.Info" />
+                            </RadzenColumn>
+                        </RadzenRow>
+                        <RadzenDataGrid TItem="VoucherTypeDto" Data="@(_voucherTypes)" IsLoading="@isLoading"
+                                        LoadData="@GetVoucherTypes" Count="@(_voucherTypes!.Count)" AllowFiltering="true"
+                                        FilterMode="FilterMode.Simple" AllowPaging="true" AllowSorting="true"
+                                        FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive" Density="Density.Compact"
+                                        AllowAlternatingRows="true" PageSize="20" PageSizeText="Rows per page" ShowPagingSummary="true"
+                                        PagerHorizontalAlign="HorizontalAlign.Center" GridLines="DataGridGridLines.Horizontal">
+                            <Columns>
+                                <RadzenDataGridColumn TItem="VoucherTypeDto" Property="VoucherCode" Title="ID"
+                                                      Filterable="false" Width="20px" />
+                                <RadzenDataGridColumn TItem="VoucherTypeDto" Property="VoucherType" Title="Type"
+                                                      Filterable="false" Width="100px" />
+                                <RadzenDataGridColumn TItem="VoucherTypeDto" Property="VoucherTitle" Title="Title"
+                                                      Filterable="false" Width="100px" />
+                                <RadzenDataGridColumn TItem="VoucherTypeDto" Property="VoucherClassificationName" Title="Classification"
+                                                      Filterable="false" Width="100px" />
+
+                                <RadzenDataGridColumn TItem="VoucherTypeDto" Sortable="false" Filterable="false" Width="20px">
+                                    <Template Context="item">
+                                        <RadzenButton Click="() => ViewVoucherTypeDetails(item)" Icon="edit_square"
+                                                      Size="ButtonSize.ExtraSmall" class="rz-border-radius-10 rz-shadow-6"
+                                                      ButtonStyle="ButtonStyle.Info" />
+                                    </Template>
+                                </RadzenDataGridColumn>
+                            </Columns>
+                        </RadzenDataGrid>
+                    </ChildContent>
+                    <ErrorContent Context="ex">
+                        <!-- Fallback UI when an error occurs -->
+                        <p class="errorUI">An error has occurred: @ex.Message</p>
+                    </ErrorContent>
+                </ErrorBoundary>
+            }
+        </RadzenColumn>
+    </RadzenRow>
+    <RadzenAlert Visible="@_showErrorAlert"
+                 Title="@_errorAlertTitle"
+                 AlertStyle="AlertStyle.Danger"
+                 Variant="Variant.Flat"
+                 Shade="Shade.Lighter"
+                 AllowClose="true"
+                 Close="@OnAlertClose">
+        @_errorAlertMessage
+    </RadzenAlert>
+</RadzenStack>
