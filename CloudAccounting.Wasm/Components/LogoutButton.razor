@@ -1,0 +1,23 @@
+﻿@using Blazored.LocalStorage
+@inject NavigationManager NavigationManager
+@inject ILocalStorageService LocalStorage
+@inject AuthenticationStateProvider AuthStateProvider
+
+<RadzenStack Orientation="Orientation.Horizontal" Style="margin-left: auto;">
+    <RadzenText class="rz-mr-3" TextStyle="TextStyle.Subtitle2">Current user: @Name</RadzenText>
+    <RadzenButton 
+        ButtonStyle="ButtonStyle.Success" 
+        Variant="Variant.Flat" 
+        Size="ButtonSize.ExtraSmall" 
+        Icon="logout" 
+        Text="Log out" 
+        Click="@Logout" />
+</RadzenStack>
+
+@code {
+    [Parameter] public string? Name { get; set; }
+    [Parameter] public EventCallback OnLogout { get; set; }
+
+    private async Task Logout()
+        => await OnLogout.InvokeAsync();
+}

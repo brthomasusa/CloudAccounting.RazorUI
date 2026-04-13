@@ -1,10 +1,31 @@
 ﻿@inherits LayoutComponentBase
 
+@using Blazored.LocalStorage
+@using CloudAccounting.Wasm.Components
+@using CloudAccounting.Wasm.Pages
+@using CloudAccounting.Wasm.Authentication
+@inject ILocalStorageService LocalStorage
+@inject AuthenticationStateProvider AuthStateProvider
+@inject NavigationManager Navigation
+
 <RadzenLayout>
     <RadzenHeader>
         <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0">
             <RadzenSidebarToggle Click="@(() => _drawerOpen = !_drawerOpen)" />
             <RadzenLabel Text="Cloud Accounting" />
+            <RadzenStack Orientation="Orientation.Horizontal" Style="margin-left: auto;">
+                <AuthorizeView>
+                    <Authorized>
+                        @if (_showLogoutButton)
+                        {
+                            <LogoutButton Name="@_userEmail" OnLogout="OnLogout" />                                          
+                        }
+                    </Authorized>
+                    <NotAuthorized>
+                        <RadzenText class="rz-mr-3" TextStyle="TextStyle.Subtitle2">Please log in.</RadzenText>
+                    </NotAuthorized>
+                </AuthorizeView>                
+            </RadzenStack>
         </RadzenStack>
     </RadzenHeader>
 
@@ -32,6 +53,42 @@
 
 @code {
     bool _drawerOpen = true;
+    private bool _showLogoutButton;
+    private string _userEmail = string.Empty;
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            var authState = await ((CustomAuthStateProvider)AuthStateProvider).GetAuthenticationStateAsync();
+            var user = authState.User;
+
+            if (!user.Identity!.IsAuthenticated)
+            {
+                _showLogoutButton = false;
+                Navigation.NavigateTo("/login");
+            }
+            else
+            {
+                var claim = user.Claims.Where(c => c.Type == "email").SingleOrDefault();
+                _userEmail = claim!.Value;
+                _showLogoutButton = true;
+            }
+        }
+        catch (Exception)
+        {        
+            Navigation.NavigateTo("/login", true);
+        }
+    }
+
+    private async Task OnLogout()
+    {
+        await ((CustomAuthStateProvider)AuthStateProvider).MarkUserAsLoggedOut();       
+
+        _showLogoutButton = false;
+
+        Navigation.NavigateTo("/login");
+    }
 
     void DrawerToggle()
     {

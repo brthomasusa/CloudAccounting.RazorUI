@@ -40,8 +40,8 @@ namespace CloudAccounting.Wasm.Pages.FiscalYear
                 }
                  
                 _companyLookups = result.Value;
-                CompanyLookup unselectedItem = new(0, "------");
-                _companyLookups.Insert(0, unselectedItem);
+                //CompanyLookup unselectedItem = new(0, "------");
+                //_companyLookups.Insert(0, unselectedItem);
 
                 await base.OnInitializedAsync();
             }

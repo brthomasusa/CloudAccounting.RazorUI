@@ -1,0 +1,66 @@
+@page "/login"
+@using Blazored.LocalStorage
+@using CloudAccounting.Wasm.Authentication
+@using Microsoft.AspNetCore.Components.Authorization
+@using CloudAccounting.Wasm.Models
+@inject HttpClient Http
+@inject AuthenticationStateProvider AuthStateProvider
+@inject ILocalStorageService LocalStorage
+@inject IConfiguration Configuration
+@inject NavigationManager Navigation
+
+<PageTitle>Login</PageTitle>
+
+<div class="rz-text-align-center rz-mt-12">
+    <RadzenText TextStyle="TextStyle.Subtitle1">Login</RadzenText>
+</div>
+
+<RadzenCard Variant="Variant.Outlined" class="rz-my-12 rz-mx-auto" Style="max-width: 420px">
+    <RadzenTemplateForm TItem="LoginCommand" Data=@user Submit=@OnSubmit>
+        <RadzenStack Gap="1rem">
+            <RadzenRow AlignItems="AlignItems.Center" RowGap="0.25rem">
+                <RadzenColumn Size="12" SizeMD="4" class="rz-text-align-start rz-text-align-md-end">
+                    <RadzenLabel Text="Email" Component="FirstName" />
+                </RadzenColumn>
+                <RadzenColumn Size="12" SizeMD="8">
+                    <RadzenTextBox Name="email" @bind-Value=@user.Email Style="display: block; width: 100%;" />
+                    <RadzenRequiredValidator Component="email" Text="An email address is required." Style="position: absolute" />
+                </RadzenColumn>
+            </RadzenRow>
+            <RadzenRow AlignItems="AlignItems.Center" RowGap="0.25rem">
+                <RadzenColumn Size="12" SizeMD="4" class="rz-text-align-start rz-text-align-md-end">
+                    <RadzenLabel Text="Password" Component="password" />
+                </RadzenColumn>
+                <RadzenColumn Size="12" SizeMD="8">
+                    <RadzenPassword Name="password" @bind-Value=@user.Password Style="display: block; width: 100%;" />
+                    <RadzenRequiredValidator Component="password" Text="A password is required." Style="position: absolute" />
+                </RadzenColumn>
+            </RadzenRow>
+            <RadzenRow AlignItems="AlignItems.Center">
+                <RadzenColumn Size="12" class="rz-text-align-end">
+                    <RadzenButton ButtonType="ButtonType.Submit" ButtonStyle="ButtonStyle.Success" Size="ButtonSize.Medium" Icon="login" Text="Login" />
+                </RadzenColumn>
+            </RadzenRow>
+        </RadzenStack>
+    </RadzenTemplateForm>
+</RadzenCard>
+
+@code {
+    LoginCommand user = new LoginCommand();
+
+    private async Task OnSubmit(LoginCommand args)
+    {
+        var result = await Http.PostAsJsonAsync("/api/v1/identity/login", user);
+
+        LoginResponseModel? responseModel = await result.Content.ReadFromJsonAsync<LoginResponseModel>();
+
+        if (responseModel != null && responseModel.Token != null)
+        {
+            await ((CustomAuthStateProvider)AuthStateProvider).MarkUserAsAuthenticated(responseModel);
+            Navigation.NavigateTo("/");
+            Navigation.Refresh();
+            // StateHasChanged();
+            // await InvokeAsync(StateHasChanged);
+        }
+    }
+}

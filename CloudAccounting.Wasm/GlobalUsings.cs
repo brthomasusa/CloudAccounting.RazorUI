@@ -1,9 +1,10 @@
-﻿global using System.Net.Http.Headers;
+﻿global using Microsoft.AspNetCore.Components;
+global using Microsoft.AspNetCore.WebUtilities;
+global using System.Net.Http.Headers;
 global using System.Net.Http.Json;
 global using System.Text;
 global using System.Text.Json;
-global using Microsoft.AspNetCore.Components;
-global using Microsoft.AspNetCore.WebUtilities;
+global using Microsoft.AspNetCore.Authorization;
 global using Radzen;
 
 global using CloudAccounting.Wasm.Models;
