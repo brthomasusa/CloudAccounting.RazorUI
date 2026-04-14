@@ -4,6 +4,7 @@
 @using CloudAccounting.Wasm.Components
 @using CloudAccounting.Wasm.Pages
 @using CloudAccounting.Wasm.Authentication
+@inject HttpClient Http
 @inject ILocalStorageService LocalStorage
 @inject AuthenticationStateProvider AuthStateProvider
 @inject NavigationManager Navigation
@@ -83,7 +84,8 @@
 
     private async Task OnLogout()
     {
-        await ((CustomAuthStateProvider)AuthStateProvider).MarkUserAsLoggedOut();       
+        await ((CustomAuthStateProvider)AuthStateProvider).MarkUserAsLoggedOut();
+        Http.DefaultRequestHeaders.Authorization = null;
 
         _showLogoutButton = false;
 

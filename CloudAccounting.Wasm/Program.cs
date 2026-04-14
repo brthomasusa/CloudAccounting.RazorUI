@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 using Polly;
 using Polly.Extensions.Http;
 using CloudAccounting.Wasm;
+using CloudAccounting.Wasm.Services.Repositories.Authentication;
 using CloudAccounting.Wasm.Services.Repositories.Company;
 using CloudAccounting.Wasm.Services.Repositories.VoucherTypes;
 using Blazored.LocalStorage;
@@ -30,7 +31,8 @@ builder.Services.AddScoped(sp => sp.GetRequiredService<IHttpClientFactory>().Cre
 
 builder.Services.AddScoped<ICompanyService, CompanyService>()
                 .AddScoped<IVoucherTypeService, VoucherTypeService>()
-                .AddScoped<ILookupService, LookupService>();
+                .AddScoped<ILookupService, LookupService>()
+                .AddScoped<IAuthenticationService, AuthenticationService>();
 
 builder.Services.AddRadzenComponents()
                 .AddScoped<DialogService>()

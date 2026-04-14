@@ -1,13 +1,10 @@
 @page "/login"
-@using Blazored.LocalStorage
-@using CloudAccounting.Wasm.Authentication
-@using Microsoft.AspNetCore.Components.Authorization
+
+@using CloudAccounting.Wasm.Services.Repositories.Authentication
 @using CloudAccounting.Wasm.Models
-@inject HttpClient Http
-@inject AuthenticationStateProvider AuthStateProvider
-@inject ILocalStorageService LocalStorage
-@inject IConfiguration Configuration
+
 @inject NavigationManager Navigation
+@inject IAuthenticationService AuthenticationService
 
 <PageTitle>Login</PageTitle>
 
@@ -15,52 +12,81 @@
     <RadzenText TextStyle="TextStyle.Subtitle1">Login</RadzenText>
 </div>
 
-<RadzenCard Variant="Variant.Outlined" class="rz-my-12 rz-mx-auto" Style="max-width: 420px">
-    <RadzenTemplateForm TItem="LoginCommand" Data=@user Submit=@OnSubmit>
-        <RadzenStack Gap="1rem">
-            <RadzenRow AlignItems="AlignItems.Center" RowGap="0.25rem">
-                <RadzenColumn Size="12" SizeMD="4" class="rz-text-align-start rz-text-align-md-end">
-                    <RadzenLabel Text="Email" Component="FirstName" />
-                </RadzenColumn>
-                <RadzenColumn Size="12" SizeMD="8">
-                    <RadzenTextBox Name="email" @bind-Value=@user.Email Style="display: block; width: 100%;" />
-                    <RadzenRequiredValidator Component="email" Text="An email address is required." Style="position: absolute" />
-                </RadzenColumn>
-            </RadzenRow>
-            <RadzenRow AlignItems="AlignItems.Center" RowGap="0.25rem">
-                <RadzenColumn Size="12" SizeMD="4" class="rz-text-align-start rz-text-align-md-end">
-                    <RadzenLabel Text="Password" Component="password" />
-                </RadzenColumn>
-                <RadzenColumn Size="12" SizeMD="8">
-                    <RadzenPassword Name="password" @bind-Value=@user.Password Style="display: block; width: 100%;" />
-                    <RadzenRequiredValidator Component="password" Text="A password is required." Style="position: absolute" />
-                </RadzenColumn>
-            </RadzenRow>
-            <RadzenRow AlignItems="AlignItems.Center">
-                <RadzenColumn Size="12" class="rz-text-align-end">
-                    <RadzenButton ButtonType="ButtonType.Submit" ButtonStyle="ButtonStyle.Success" Size="ButtonSize.Medium" Icon="login" Text="Login" />
-                </RadzenColumn>
-            </RadzenRow>
-        </RadzenStack>
-    </RadzenTemplateForm>
-</RadzenCard>
+<ErrorBoundary>
+    <ChildContent>
+        <RadzenCard Variant="Variant.Outlined" class="rz-my-12 rz-mx-auto" Style="max-width: 420px">
+            <RadzenTemplateForm TItem="LoginCommand" Data=@user Submit=@OnSubmit>
+                <RadzenStack Gap="1rem">
+                    <RadzenRow AlignItems="AlignItems.Center" RowGap="0.25rem">
+                        <RadzenColumn Size="12" SizeMD="4" class="rz-text-align-start rz-text-align-md-end">
+                            <RadzenLabel Text="Email" Component="FirstName" />
+                        </RadzenColumn>
+                        <RadzenColumn Size="12" SizeMD="8">
+                            <RadzenTextBox Name="email" @bind-Value=@user.Email Style="display: block; width: 100%;" />
+                            <RadzenRequiredValidator Component="email" Text="An email address is required." Style="position: absolute" />
+                            <RadzenEmailValidator Component="email" Text="Provide a valid email address" Style="position: absolute" />
+                        </RadzenColumn>
+                    </RadzenRow>
+                    <RadzenRow AlignItems="AlignItems.Center" RowGap="0.25rem">
+                        <RadzenColumn Size="12" SizeMD="4" class="rz-text-align-start rz-text-align-md-end">
+                            <RadzenLabel Text="Password" Component="password" />
+                        </RadzenColumn>
+                        <RadzenColumn Size="12" SizeMD="8">
+                            <RadzenPassword Name="password" @bind-Value=@user.Password Style="display: block; width: 100%;" />
+                            <RadzenRequiredValidator Component="password" Text="A password is required." Style="position: absolute" />
+                        </RadzenColumn>
+                    </RadzenRow>
+                    <RadzenRow AlignItems="AlignItems.Center">
+                        <RadzenColumn Size="12" class="rz-text-align-end">
+                            <RadzenButton ButtonType="ButtonType.Submit" ButtonStyle="ButtonStyle.Success" Size="ButtonSize.Medium" Icon="login" Text="Login" />
+                        </RadzenColumn>
+                    </RadzenRow>
+                </RadzenStack>
+            </RadzenTemplateForm>
+        </RadzenCard>
+
+        <RadzenAlert Visible="@_showErrorAlert"
+                     Title="@_errorAlertTitle"
+                     AlertStyle="AlertStyle.Danger"
+                     Variant="Variant.Flat"
+                     Shade="Shade.Lighter"
+                     AllowClose="true"
+                     Close="@OnAlertClose">
+            @_errorAlertMessage
+        </RadzenAlert>
+    </ChildContent>
+    <ErrorContent Context="ex">
+        <p class="errorUI">An error has occurred: @ex.Message</p>
+    </ErrorContent>
+</ErrorBoundary>
 
 @code {
-    LoginCommand user = new LoginCommand();
+    private LoginCommand user = new LoginCommand();
+    private bool _showErrorAlert = false;
+    private string _errorAlertMessage = string.Empty;
+    private string _errorAlertTitle = string.Empty;
 
     private async Task OnSubmit(LoginCommand args)
     {
-        var result = await Http.PostAsJsonAsync("/api/v1/identity/login", user);
+        Result<LoginResponseModel> result = await AuthenticationService.LoginAsync(args);
 
-        LoginResponseModel? responseModel = await result.Content.ReadFromJsonAsync<LoginResponseModel>();
-
-        if (responseModel != null && responseModel.Token != null)
+        if (result.IsSuccess)
         {
-            await ((CustomAuthStateProvider)AuthStateProvider).MarkUserAsAuthenticated(responseModel);
             Navigation.NavigateTo("/");
             Navigation.Refresh();
-            // StateHasChanged();
-            // await InvokeAsync(StateHasChanged);
         }
+        else
+        {
+            _errorAlertTitle = "Log in failed!";
+            _errorAlertMessage = result.Error.Message;
+            _showErrorAlert = true;
+        }
+    }
+
+    private void OnAlertClose()
+    {
+        _showErrorAlert = false;
+        _errorAlertMessage = string.Empty;
+        _errorAlertTitle = string.Empty;
     }
 }
