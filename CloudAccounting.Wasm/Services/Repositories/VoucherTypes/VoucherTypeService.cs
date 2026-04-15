@@ -4,11 +4,11 @@ namespace CloudAccounting.Wasm.Services.Repositories.VoucherTypes
 {
     public class VoucherTypeService
     (
-        IHttpClientFactory factory,
+        IHttpClientFactory ClientFactory,
         ILogger<VoucherTypeService> logger
     ) : IVoucherTypeService
     {
-        private readonly HttpClient _httpClient = factory.CreateClient("CloudAccountingApi");
+        private readonly HttpClient _httpClient = ClientFactory.CreateClient("CloudAccountingAPI");
         private readonly ILogger<VoucherTypeService>? _logger = logger;
         private const string relativePath = "/api/v1/vouchertypes";
 

@@ -5,11 +5,11 @@ namespace CloudAccounting.Wasm.Services.Repositories.Common
 {
     public class LookupService
         (
-            IHttpClientFactory factory, 
+            IHttpClientFactory ClientFactory,
             ILogger<LookupService>? logger
         ) : ILookupService
     {
-        private readonly HttpClient _httpClient = factory.CreateClient("CloudAccountingApi");
+        private readonly HttpClient _httpClient = ClientFactory.CreateClient("CloudAccountingAPI");
         private readonly ILogger<LookupService>? _logger = logger;
         private const string relativePath = "/api/v1/lookups";
 

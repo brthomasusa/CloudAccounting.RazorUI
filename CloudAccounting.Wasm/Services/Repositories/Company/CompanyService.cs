@@ -1,14 +1,13 @@
-﻿using System;
-
+﻿
 namespace CloudAccounting.Wasm.Services.Repositories.Company
 {
     public class CompanyService
     (
-        IHttpClientFactory factory,
+        IHttpClientFactory ClientFactory,
         ILogger<CompanyService> logger
     ) : ICompanyService
     {
-        private readonly HttpClient _httpClient = factory.CreateClient("CloudAccountingApi");
+        private readonly HttpClient _httpClient = ClientFactory.CreateClient("CloudAccountingAPI");
         private readonly ILogger<CompanyService>? _logger = logger;
         private const string relativePath = "/api/v1/companies";
 
