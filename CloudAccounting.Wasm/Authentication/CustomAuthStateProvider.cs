@@ -1,15 +1,17 @@
 #pragma warning disable CS8604
 
-using System.Security.Claims;
+using Blazored.SessionStorage;
+using CloudAccounting.Wasm.Models.Authentication;
+using CloudAccounting.Wasm.Models.Common;
 using Microsoft.AspNetCore.Components.Authorization;
-using Blazored.LocalStorage;
 using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
 
 namespace CloudAccounting.Wasm.Authentication
 {
     public class CustomAuthStateProvider
     (
-        ILocalStorageService localStorage,
+        ISessionStorageService sessionStorage,
         HttpClient httpClient
     ) : AuthenticationStateProvider
     {
@@ -19,7 +21,7 @@ namespace CloudAccounting.Wasm.Authentication
         {
             try
             {
-                string? authToken = await localStorage.GetItemAsync<string>("authToken");
+                string? authToken = await sessionStorage.GetItemAsync<string>("authToken");
 
                 var identity = authToken == null ? new ClaimsIdentity() : GetClaimsIdentity(authToken);
 
@@ -36,10 +38,14 @@ namespace CloudAccounting.Wasm.Authentication
             }
         }
 
-        public async Task MarkUserAsAuthenticated(string authToken)
+        public async Task MarkUserAsAuthenticated(LoginResponseModel loginResponse)
         {
-            var identity = GetClaimsIdentity(authToken);
+            await sessionStorage.SetItemAsync("authToken", loginResponse.Token);
+            await sessionStorage.SetItemAsync("refreshToken", loginResponse.RefreshToken);
+
+            var identity = GetClaimsIdentity(loginResponse.Token);
             var user = new ClaimsPrincipal(identity);
+
             NotifyAuthenticationStateChanged(Task.FromResult(new AuthenticationState(user)));
         }
 
@@ -53,19 +59,13 @@ namespace CloudAccounting.Wasm.Authentication
 
         public async Task MarkUserAsLoggedOut()
         {
-            await localStorage.RemoveItemAsync("authToken");
-            await localStorage.RemoveItemAsync("refreshToken");
-            await localStorage.RemoveItemAsync("tokenExpiration");
+            await sessionStorage.RemoveItemAsync("authToken");
+            await sessionStorage.RemoveItemAsync("refreshToken");
 
             var identity = new ClaimsIdentity();
             var user = new ClaimsPrincipal(identity);
+
             NotifyAuthenticationStateChanged(Task.FromResult(new AuthenticationState(user)));
         }
-
-
-
-
-
-
     }
 }

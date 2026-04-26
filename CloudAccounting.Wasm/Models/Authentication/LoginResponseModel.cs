@@ -1,5 +1,4 @@
-
-namespace CloudAccounting.Wasm.Models
+namespace CloudAccounting.Wasm.Models.Authentication
 {
     public class LoginResponseModel
     {

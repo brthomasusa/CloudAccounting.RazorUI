@@ -1,0 +1,15 @@
+﻿
+<RadzenStack Orientation="Orientation.Horizontal" Style="margin-left: auto;">
+    <RadzenText class="rz-mr-5" TextStyle="TextStyle.Subtitle2">@CompanyName</RadzenText>
+    <RadzenText TextStyle="TextStyle.Subtitle2">@CompanyMonthName</RadzenText>
+    <RadzenText TextStyle="TextStyle.Subtitle2">@Separator</RadzenText>
+    <RadzenText class="rz-mr-5" TextStyle="TextStyle.Subtitle2">@CurrentFiscalYear</RadzenText>
+</RadzenStack>
+
+@code {
+    [Parameter] public string? CompanyName { get; set; }
+    [Parameter] public string? CompanyMonthName { get; set; }
+    [Parameter] public string? CurrentFiscalYear { get; set; }
+
+    private string Separator => "/";
+}

@@ -2,10 +2,16 @@
 
 @using Blazored.LocalStorage
 @using CloudAccounting.Wasm.Components
+@using CloudAccounting.Wasm.Models.Authentication
+@using CloudAccounting.Wasm.Models.Common
 @using CloudAccounting.Wasm.Pages
 @using CloudAccounting.Wasm.Authentication
+@using CloudAccounting.Wasm.Services.ApplicationState
+@using CloudAccounting.Wasm.Services.Repositories.Authentication
+
 @inject HttpClient Http
 @inject ILocalStorageService LocalStorage
+@inject IAuthenticationService AuthenticationService
 @inject AuthenticationStateProvider AuthStateProvider
 @inject NavigationManager Navigation
 
@@ -17,6 +23,11 @@
             <RadzenStack Orientation="Orientation.Horizontal" Style="margin-left: auto;">
                 <AuthorizeView>
                     <Authorized>
+                        <CompanyFiscalYearIndicator 
+                            CompanyName="@_companyName" 
+                            CompanyMonthName="@_companyMonthName" 
+                            CurrentFiscalYear="@_currentFiscalYear" />
+
                         @if (_showLogoutButton)
                         {
                             <LogoutButton Name="@_userEmail" OnLogout="OnLogout" />                                          
@@ -56,6 +67,11 @@
     bool _drawerOpen = true;
     private bool _showLogoutButton;
     private string _userEmail = string.Empty;
+    private string _companyName = string.Empty;
+    private string _companyMonthName = string.Empty;
+    private string _currentFiscalYear = string.Empty;
+
+    [Inject] private IAuthenticatedUserState? AuthenticatedUserState { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
@@ -65,7 +81,7 @@
             var user = authState.User;
 
             if (!user.Identity!.IsAuthenticated)
-            {
+            {                
                 _showLogoutButton = false;
                 Navigation.NavigateTo("/login");
             }
@@ -74,6 +90,16 @@
                 var claim = user.Claims.Where(c => c.Type == "email").SingleOrDefault();
                 _userEmail = claim!.Value;
                 _showLogoutButton = true;
+
+                Result<ApplicationUser> userResult = await AuthenticationService.GetUserByIdAsync(_userEmail);
+                AuthenticatedUserState?.SetUser(userResult.Value);
+
+                ApplicationUser applicationUser = AuthenticatedUserState!.GetUser();
+                _companyName = applicationUser.CompanyName;
+                _companyMonthName = applicationUser.CompanyMonthName;
+                _currentFiscalYear = applicationUser.CompanyYear.ToString();
+                Navigation.NavigateTo("/");
+                // await InvokeAsync(StateHasChanged);
             }
         }
         catch (Exception)

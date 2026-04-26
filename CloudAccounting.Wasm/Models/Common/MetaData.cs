@@ -1,4 +1,4 @@
-﻿namespace CloudAccounting.Wasm.Models
+﻿namespace CloudAccounting.Wasm.Models.Common
 {
     public class MetaData(int pageNumber, int pageSize, int totalRecords)
     {

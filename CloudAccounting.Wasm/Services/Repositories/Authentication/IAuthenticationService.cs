@@ -1,4 +1,4 @@
-﻿using CloudAccounting.Wasm.Models;
+﻿using CloudAccounting.Wasm.Models.Authentication;
 
 namespace CloudAccounting.Wasm.Services.Repositories.Authentication
 {
@@ -7,5 +7,7 @@ namespace CloudAccounting.Wasm.Services.Repositories.Authentication
         Task<Result<LoginResponseModel>> LoginAsync(LoginCommand request);
 
         Task<Result<string>> RefreshAuthTokenAsync();
+
+        Task<Result<ApplicationUser>> GetUserByIdAsync(string userId);
     }
 }

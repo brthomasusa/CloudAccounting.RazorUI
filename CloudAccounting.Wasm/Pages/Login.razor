@@ -1,10 +1,14 @@
 @page "/login"
 
+@using CloudAccounting.Wasm.Authentication
+@using CloudAccounting.Wasm.Models.Common
+@using CloudAccounting.Wasm.Services.ApplicationState
 @using CloudAccounting.Wasm.Services.Repositories.Authentication
-@using CloudAccounting.Wasm.Models
+@using CloudAccounting.Wasm.Models.Authentication
 
 @inject NavigationManager Navigation
 @inject IAuthenticationService AuthenticationService
+@inject AuthenticationStateProvider AuthStateProvider
 
 <PageTitle>Login</PageTitle>
 
@@ -19,7 +23,7 @@
                 <RadzenStack Gap="1rem">
                     <RadzenRow AlignItems="AlignItems.Center" RowGap="0.25rem">
                         <RadzenColumn Size="12" SizeMD="4" class="rz-text-align-start rz-text-align-md-end">
-                            <RadzenLabel Text="Email" Component="FirstName" />
+                            <RadzenLabel Text="Email" Component="email" />
                         </RadzenColumn>
                         <RadzenColumn Size="12" SizeMD="8">
                             <RadzenTextBox Name="email" @bind-Value=@user.Email Style="display: block; width: 100%;" />
@@ -65,6 +69,7 @@
     private bool _showErrorAlert = false;
     private string _errorAlertMessage = string.Empty;
     private string _errorAlertTitle = string.Empty;
+    [Inject] private IAuthenticatedUserState? AuthenticatedUserState { get; set; }
 
     private async Task OnSubmit(LoginCommand args)
     {
@@ -72,8 +77,9 @@
 
         if (result.IsSuccess)
         {
+            await ((CustomAuthStateProvider)AuthStateProvider).MarkUserAsAuthenticated(result.Value);
             Navigation.NavigateTo("/");
-            Navigation.Refresh();
+            // Navigation.Refresh();
         }
         else
         {

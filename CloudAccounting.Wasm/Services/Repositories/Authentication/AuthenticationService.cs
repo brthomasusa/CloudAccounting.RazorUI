@@ -1,5 +1,7 @@
-﻿using Blazored.LocalStorage;
+﻿using Blazored.SessionStorage;
 using CloudAccounting.Wasm.Authentication;
+using CloudAccounting.Wasm.Models.Authentication;
+
 using Microsoft.AspNetCore.Components.Authorization;
 
 namespace CloudAccounting.Wasm.Services.Repositories.Authentication
@@ -7,8 +9,8 @@ namespace CloudAccounting.Wasm.Services.Repositories.Authentication
     public class AuthenticationService
     (
         AuthenticationStateProvider authenticationStateProvider,
-        ILocalStorageService localStorage,
-        IHttpClientFactory ClientFactory
+        IHttpClientFactory ClientFactory,
+        ISessionStorageService sessionStorage
 
     ) : IAuthenticationService
     {
@@ -27,12 +29,7 @@ namespace CloudAccounting.Wasm.Services.Repositories.Authentication
 
                     if (loginResponse is not null && loginResponse.Token != null)
                     {
-                        await localStorage.SetItemAsync("authToken", loginResponse.Token);
-                        await localStorage.SetItemAsync("refreshToken", loginResponse.RefreshToken);
-                        await localStorage.SetItemAsync("tokenExpiration", loginResponse.TokenExpired);
-
-                        await ((CustomAuthStateProvider)authenticationStateProvider).MarkUserAsAuthenticated(loginResponse.Token);
-                        _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", loginResponse.Token);
+                        await ((CustomAuthStateProvider)authenticationStateProvider).MarkUserAsAuthenticated(loginResponse);
 
                         return Result<LoginResponseModel>.Success(loginResponse);
                     }
@@ -76,7 +73,7 @@ namespace CloudAccounting.Wasm.Services.Repositories.Authentication
                 {
                     // Token is about to expire, attempt to refresh
 
-                    var refreshToken = await localStorage.GetItemAsync<string>("refreshToken");
+                    var refreshToken = await sessionStorage.GetItemAsync<string>("refreshToken");
 
                     if (string.IsNullOrEmpty(refreshToken))
                     {
@@ -91,11 +88,7 @@ namespace CloudAccounting.Wasm.Services.Repositories.Authentication
 
                         if (loginResponse is not null && loginResponse.Token != null)
                         {
-                            await localStorage.SetItemAsync("authToken", loginResponse.Token);
-                            await localStorage.SetItemAsync("refreshToken", loginResponse.RefreshToken);
-                            await localStorage.SetItemAsync("tokenExpiration", loginResponse.TokenExpired);
-
-                            //_httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", loginResponse.Token);
+                            await ((CustomAuthStateProvider)authenticationStateProvider).MarkUserAsAuthenticated(loginResponse);
 
                             return loginResponse.Token;
                         }
@@ -114,13 +107,50 @@ namespace CloudAccounting.Wasm.Services.Repositories.Authentication
                 else
                 {
                     // Token is still valid
-                    string? token = await localStorage.GetItemAsync<string>("authToken");
+                    string? token = await sessionStorage.GetItemAsync<string>("authToken");
                     return Result<string>.Success(token!);
                 }
             }
             catch (Exception ex)
             {
                 return Result<string>.Failure<string>(new Error("IdentityMgmtRepository.RefreshAuthTokenAsync", ex.Message));
+            }
+        }
+
+        public async Task<Result<ApplicationUser>> GetUserByIdAsync(string userId)
+        {
+            try
+            {
+                var result = await _httpClient.GetAsync($"{uri}users/{userId}");
+
+                if (result.IsSuccessStatusCode)
+                {
+                    var response = await result.Content.ReadFromJsonAsync<ApplicationUser>();
+
+                    if (response is not null)
+                    {
+                        return Result<ApplicationUser>.Success(response);
+                    }
+                    else
+                    {
+                        return Result<ApplicationUser>.Failure<ApplicationUser>(
+                            new Error("IdentityMgmtRepository.GetUserByIdAsync", "User not found")
+                        );
+                    }
+                }
+                else
+                {
+                    var errorContent = await result.Content.ReadAsStringAsync();
+                    return Result<ApplicationUser>.Failure<ApplicationUser>(
+                        new Error("IdentityMgmtRepository.GetUserByIdAsync", errorContent)
+                    );
+                }
+            }
+            catch (Exception ex)
+            {
+                return Result<ApplicationUser>.Failure<ApplicationUser>(
+                    new Error("IdentityMgmtRepository.GetUserByIdAsync", ex.Message)
+                );
             }
         }
     }
