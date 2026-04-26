@@ -9,9 +9,15 @@ namespace CloudAccounting.Wasm.Services.ApplicationState
         void SetUserId(string userId);
         void SetUser(ApplicationUser user);
         ApplicationUser GetUser();
+
         void SetCompany(int companyCode, string companyName);
-         void SetCompanyYear(Int16 companyYear);
-         void SetCompanyMonth(byte companyMonthId, string companyMonthName);
+        string GetCompanyName();
+
+        void SetCompanyYear(Int16 companyYear);
+        string GetCompanyYear();
+
+        void SetCompanyMonth(byte companyMonthId, string companyMonthName);
+        string GetCompanyMonthName();
 
         void SetGroup(Int16 groupId, string groupTitle);
     }

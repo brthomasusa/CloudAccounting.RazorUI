@@ -1,17 +1,12 @@
 ﻿@inherits LayoutComponentBase
 
-@using Blazored.LocalStorage
+@implements IDisposable
+
 @using CloudAccounting.Wasm.Components
-@using CloudAccounting.Wasm.Models.Authentication
-@using CloudAccounting.Wasm.Models.Common
 @using CloudAccounting.Wasm.Pages
 @using CloudAccounting.Wasm.Authentication
 @using CloudAccounting.Wasm.Services.ApplicationState
-@using CloudAccounting.Wasm.Services.Repositories.Authentication
 
-@inject HttpClient Http
-@inject ILocalStorageService LocalStorage
-@inject IAuthenticationService AuthenticationService
 @inject AuthenticationStateProvider AuthStateProvider
 @inject NavigationManager Navigation
 
@@ -24,17 +19,17 @@
                 <AuthorizeView>
                     <Authorized>
                         <CompanyFiscalYearIndicator 
-                            CompanyName="@_companyName" 
-                            CompanyMonthName="@_companyMonthName" 
-                            CurrentFiscalYear="@_currentFiscalYear" />
+                            CompanyName="@AuthenticatedUserState!.GetCompanyName()" 
+                            CompanyMonthName="@AuthenticatedUserState!.GetCompanyMonthName()" 
+                            CurrentFiscalYear="@AuthenticatedUserState!.GetCompanyYear()" />
 
-                        @if (_showLogoutButton)
+                        @if (@AuthenticatedUserState!.GetUser() != null)
                         {
-                            <LogoutButton Name="@_userEmail" OnLogout="OnLogout" />                                          
+                            <LogoutButton Name="@AuthenticatedUserState!.GetUser().UserId" />
                         }
                     </Authorized>
                     <NotAuthorized>
-                        <RadzenText class="rz-mr-3" TextStyle="TextStyle.Subtitle2">Please log in.</RadzenText>
+                        <RadzenText class="rz-mr-4" TextStyle="TextStyle.Subtitle2">Please log in.</RadzenText>
                     </NotAuthorized>
                 </AuthorizeView>                
             </RadzenStack>
@@ -65,11 +60,6 @@
 
 @code {
     bool _drawerOpen = true;
-    private bool _showLogoutButton;
-    private string _userEmail = string.Empty;
-    private string _companyName = string.Empty;
-    private string _companyMonthName = string.Empty;
-    private string _currentFiscalYear = string.Empty;
 
     [Inject] private IAuthenticatedUserState? AuthenticatedUserState { get; set; }
 
@@ -77,29 +67,14 @@
     {
         try
         {
+            AuthenticatedUserState!.OnChange += StateHasChanged;
+
             var authState = await ((CustomAuthStateProvider)AuthStateProvider).GetAuthenticationStateAsync();
             var user = authState.User;
 
             if (!user.Identity!.IsAuthenticated)
             {                
-                _showLogoutButton = false;
                 Navigation.NavigateTo("/login");
-            }
-            else
-            {
-                var claim = user.Claims.Where(c => c.Type == "email").SingleOrDefault();
-                _userEmail = claim!.Value;
-                _showLogoutButton = true;
-
-                Result<ApplicationUser> userResult = await AuthenticationService.GetUserByIdAsync(_userEmail);
-                AuthenticatedUserState?.SetUser(userResult.Value);
-
-                ApplicationUser applicationUser = AuthenticatedUserState!.GetUser();
-                _companyName = applicationUser.CompanyName;
-                _companyMonthName = applicationUser.CompanyMonthName;
-                _currentFiscalYear = applicationUser.CompanyYear.ToString();
-                Navigation.NavigateTo("/");
-                // await InvokeAsync(StateHasChanged);
             }
         }
         catch (Exception)
@@ -108,18 +83,13 @@
         }
     }
 
-    private async Task OnLogout()
-    {
-        await ((CustomAuthStateProvider)AuthStateProvider).MarkUserAsLoggedOut();
-        Http.DefaultRequestHeaders.Authorization = null;
-
-        _showLogoutButton = false;
-
-        Navigation.NavigateTo("/login");
-    }
-
     void DrawerToggle()
     {
         _drawerOpen = !_drawerOpen;
+    }
+
+    public void Dispose()
+    {
+        AuthenticatedUserState!.OnChange -= StateHasChanged;
     }
 }

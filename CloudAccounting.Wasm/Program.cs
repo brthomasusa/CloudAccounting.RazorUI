@@ -21,6 +21,7 @@ builder.Services.AddTransient<RetryDelegatingHandler>();
 builder.Services.AddBlazoredLocalStorage();
 builder.Services.AddBlazoredSessionStorage();
 builder.Services.AddScoped<AuthenticationStateProvider, CustomAuthStateProvider>();
+builder.Services.AddCascadingAuthenticationState();
 builder.Services.AddAuthorizationCore();
 
 Uri baseAddress = new(builder.Configuration["CloudAcctgApi"]!);

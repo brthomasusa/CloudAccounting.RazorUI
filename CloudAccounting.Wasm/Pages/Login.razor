@@ -1,7 +1,6 @@
 @page "/login"
 
 @using CloudAccounting.Wasm.Authentication
-@using CloudAccounting.Wasm.Models.Common
 @using CloudAccounting.Wasm.Services.ApplicationState
 @using CloudAccounting.Wasm.Services.Repositories.Authentication
 @using CloudAccounting.Wasm.Models.Authentication
@@ -78,8 +77,15 @@
         if (result.IsSuccess)
         {
             await ((CustomAuthStateProvider)AuthStateProvider).MarkUserAsAuthenticated(result.Value);
+
+            Result<ApplicationUser> userResult = await AuthenticationService.GetUserByIdAsync(user.Email);
+
+            if (userResult.IsSuccess)
+            {
+                AuthenticatedUserState!.SetUser(userResult.Value);
+            }
+
             Navigation.NavigateTo("/");
-            // Navigation.Refresh();
         }
         else
         {

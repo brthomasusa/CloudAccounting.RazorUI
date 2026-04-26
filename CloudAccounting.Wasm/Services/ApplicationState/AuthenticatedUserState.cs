@@ -36,6 +36,10 @@ namespace CloudAccounting.Wasm.Services.ApplicationState
             NotifyStateChanged();
         }
 
+        public string GetCompanyName() => _applicationUser.CompanyName;
+        public string GetCompanyYear() => _applicationUser.CompanyYear.ToString();
+        public string GetCompanyMonthName() => _applicationUser.CompanyMonthName;
+
         public void SetCompanyMonth(byte companyMonthId, string companyMonthName)
         {
             _applicationUser.CompanyMonthId = companyMonthId;

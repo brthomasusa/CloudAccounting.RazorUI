@@ -1,7 +1,7 @@
-﻿@using Blazored.LocalStorage
-@inject NavigationManager NavigationManager
-@inject ILocalStorageService LocalStorage
+﻿@using CloudAccounting.Wasm.Authentication
 @inject AuthenticationStateProvider AuthStateProvider
+@inject NavigationManager Navigation
+@inject HttpClient Http
 
 <RadzenStack Orientation="Orientation.Horizontal" Style="margin-left: auto;">
     <RadzenText class="rz-mr-3" TextStyle="TextStyle.Subtitle2">@Name</RadzenText>
@@ -16,8 +16,12 @@
 
 @code {
     [Parameter] public string? Name { get; set; }
-    [Parameter] public EventCallback OnLogout { get; set; }
 
     private async Task Logout()
-        => await OnLogout.InvokeAsync();
+    {
+        await ((CustomAuthStateProvider)AuthStateProvider).MarkUserAsLoggedOut();
+        Http.DefaultRequestHeaders.Authorization = null;
+
+        Navigation.NavigateTo("/login");
+    }
 }
