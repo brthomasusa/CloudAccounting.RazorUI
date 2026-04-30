@@ -41,9 +41,14 @@
             <RadzenPanelMenuItem Text="Home" Icon="home" Path="/" />
 
             <RadzenPanelMenuItem Text="Setup" Icon="build">
-                <RadzenPanelMenuItem Text="Company" Icon="corporate_fare" Path="/Pages/Company/CompaniesListPage" />
-                <RadzenPanelMenuItem Text="Fiscal Year" Icon="date_range" Path="/Pages/FiscalYear/FiscalYearSetupPage" />
-                <RadzenPanelMenuItem Text="Voucher Types" Icon="local_activity" Path="/Pages/VoucherTypes/VoucherTypesListPage" />
+                <AuthorizeView Roles="CompanyAdmin">
+                    <Authorized>    
+                        <RadzenPanelMenuItem Text="Company" Icon="corporate_fare" Path="/Pages/Company/CompaniesListPage" />
+                        <RadzenPanelMenuItem Text="Fiscal Year" Icon="date_range" Path="/Pages/FiscalYear/FiscalYearSetupPage" />
+                        <RadzenPanelMenuItem Text="Voucher Types" Icon="local_activity" Path="/Pages/VoucherTypes/VoucherTypesListPage" />                            
+                        <RadzenPanelMenuItem Text="Roles &Users" Icon="people" Path="/Pages/Users/UsersListPage" />
+                    </Authorized>
+                </AuthorizeView>
             </RadzenPanelMenuItem>
         </RadzenPanelMenu>
     </RadzenSidebar>
