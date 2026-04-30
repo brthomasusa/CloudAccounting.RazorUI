@@ -1,10 +1,10 @@
 ﻿@using CloudAccounting.Wasm.Services.ApplicationState
 
 <RadzenStack Orientation="Orientation.Horizontal" Style="margin-left: auto;">
-    <RadzenText class="rz-mr-3 rz-color-info-dark" TextStyle="TextStyle.Subtitle2">@CompanyName</RadzenText>
-    <RadzenText class="rz-color-info-dark" TextStyle="TextStyle.Subtitle2">@CompanyMonthName</RadzenText>
+    <RadzenText class="rz-mr-3 rz-color-info-dark" TextStyle="TextStyle.Subtitle2"><strong>@CompanyName</strong></RadzenText>
+    <RadzenText class="rz-color-info-dark" TextStyle="TextStyle.Subtitle2"><strong>@CompanyMonthName</strong></RadzenText>
     <RadzenText TextStyle="TextStyle.Subtitle2">@Separator</RadzenText>
-    <RadzenText class="rz-mr-12 rz-color-info-dark" TextStyle="TextStyle.Subtitle2">@CurrentFiscalYear</RadzenText>
+    <RadzenText class="rz-mr-12 rz-color-info-dark" TextStyle="TextStyle.Subtitle2"><strong>@CurrentFiscalYear</strong></RadzenText>
 </RadzenStack>
 
 @code {
