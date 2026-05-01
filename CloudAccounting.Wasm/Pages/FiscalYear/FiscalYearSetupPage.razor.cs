@@ -4,16 +4,15 @@ namespace CloudAccounting.Wasm.Pages.FiscalYear
 {
     public partial class FiscalYearSetupPage
     {
-        [Inject] private ILookupService? LookupService { get; set; }
+
         [Inject] private ICompanyService? CompanyService { get; set; }
         [Inject] public DialogService? DialogService { get; set; }
         [Inject] private NotificationService? NotificationService { get; set; }
         [Inject] private NavigationManager? Navigation { get; set; }
         [Inject] private ILogger<FiscalYearSetupPage>? Logger { get; set; }
+        [Inject] private IAuthenticatedUserState? AuthenticatedUserState { get; set; }
 
-        //private readonly RadzenTemplateForm<CreateFiscalYearCommand>? _fiscalYearParametersForm;
         private CreateFiscalYearCommand _fiscalYearCommand = new(0,0,DateTime.MinValue);
-        private List<CompanyLookup>? _companyLookups;
         private FiscalYearDto? _fiscalYearDto = null;
         private int _selectedCompanyCode;
         private bool _disableFiscalYearDeleteButton = true;
@@ -27,21 +26,10 @@ namespace CloudAccounting.Wasm.Pages.FiscalYear
         {
             try
             {
-                Result<List<CompanyLookup>>? result = await LookupService!.GetCompanyLookups();
+                int companyCode = AuthenticatedUserState!.GetUser().CompanyCode;
+                _fiscalYearCommand.CompanyCode = companyCode;
 
-                if (result.IsFailure)
-                {
-                    Logger!.LogError("Failed to retrieve company lookups: {ERROR}.", result.Error.Message);
-                    _errorAlertTitle = "Error retrieving company lookup data";
-                    _errorAlertMessage = result.Error.Message;
-                    _showErrorAlert = true;
-
-                    Navigation?.NavigateTo("/");
-                }
-                 
-                _companyLookups = result.Value;
-                //CompanyLookup unselectedItem = new(0, "------");
-                //_companyLookups.Insert(0, unselectedItem);
+                await GetCurrentFiscalYear(companyCode);
 
                 await base.OnInitializedAsync();
             }
@@ -56,19 +44,18 @@ namespace CloudAccounting.Wasm.Pages.FiscalYear
             }
         }
 
-        private async Task OnCompanyDropDownChanged(object companyCode)
+        private async Task GetCurrentFiscalYear(int companyCode)
         {
-            int code = Convert.ToInt32(companyCode);
-
-            if (code == 0) 
+            if (companyCode == 0) 
             { 
                 _disableGenerateFiscalYearButton = true;
             } 
             else 
             {
-                await GetFiscalYears(code);
+                await GetFiscalYears(companyCode);
             }            
-         }
+        }
+
 
         private async Task GetFiscalYears(int companyCode)
         {
@@ -226,6 +213,5 @@ namespace CloudAccounting.Wasm.Pages.FiscalYear
             _errorAlertMessage = string.Empty;
             _errorAlertTitle = string.Empty;
         }
-
     }
 }

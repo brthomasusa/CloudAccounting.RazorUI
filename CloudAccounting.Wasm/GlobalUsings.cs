@@ -10,5 +10,6 @@ global using Radzen;
 global using CloudAccounting.Wasm.Models;
 global using CloudAccounting.Wasm.Models.Lookups;
 global using CloudAccounting.Wasm.Models.Company;
+global using CloudAccounting.Wasm.Services.ApplicationState;
 global using CloudAccounting.Wasm.Services.Repositories.Common;
 global using CloudAccounting.Wasm.Utilities;
