@@ -31,11 +31,11 @@ namespace CloudAccounting.Wasm.Services.Repositories.Authentication
                     {
                         await ((CustomAuthStateProvider)authenticationStateProvider).MarkUserAsAuthenticated(loginResponse);
 
-                        return Result<LoginResponseModel>.Success(loginResponse);
+                        return Result.Success(loginResponse);
                     }
                     else
                     {
-                        return Result<LoginResponseModel>.Failure<LoginResponseModel>(
+                        return Result.Failure<LoginResponseModel>(
                             new Error("IdentityMgmtRepository.LoginUserAsync", "Invalid login attempt")
                         );
                     }
@@ -44,14 +44,14 @@ namespace CloudAccounting.Wasm.Services.Repositories.Authentication
                 {
                     var errorContent = await response.Content.ReadAsStringAsync();
 
-                    return Result<LoginResponseModel>.Failure<LoginResponseModel>(
+                    return Result.Failure<LoginResponseModel>(
                         new Error("IdentityMgmtRepository.LoginUserAsync", errorContent)
                     );
                 }
             }
             catch (Exception ex)
             {
-                return Result<LoginResponseModel>.Failure<LoginResponseModel>(
+                return Result.Failure<LoginResponseModel>(
                     new Error("IdentityMgmtRepository.LoginUserAsync", ex.Message)
                 );
             }
@@ -77,7 +77,7 @@ namespace CloudAccounting.Wasm.Services.Repositories.Authentication
 
                     if (string.IsNullOrEmpty(refreshToken))
                     {
-                        return Result<string>.Failure<string>(new Error("IdentityMgmtRepository.RefreshAuthTokenAsync", "No refresh token found"));
+                        return Result.Failure<string>(new Error("IdentityMgmtRepository.RefreshAuthTokenAsync", "No refresh token found"));
                     }
 
                     var response = await _httpClient.PostAsJsonAsync($"{uri}loginbyrefreshtoken", new { RefreshToken = refreshToken });
@@ -94,13 +94,13 @@ namespace CloudAccounting.Wasm.Services.Repositories.Authentication
                         }
                         else
                         {
-                            return Result<string>.Failure<string>(new Error("IdentityMgmtRepository.RefreshAuthTokenAsync", "Failed token refresh attempt"));
+                            return Result.Failure<string>(new Error("IdentityMgmtRepository.RefreshAuthTokenAsync", "Failed token refresh attempt"));
                         }
                     }
                     else
                     {
                         var errorContent = await response.Content.ReadAsStringAsync();
-                        return Result<string>.Failure<string>(new Error("IdentityMgmtRepository.RefreshAuthTokenAsync", errorContent));
+                        return Result.Failure<string>(new Error("IdentityMgmtRepository.RefreshAuthTokenAsync", errorContent));
                     }
 
                 }
@@ -108,12 +108,12 @@ namespace CloudAccounting.Wasm.Services.Repositories.Authentication
                 {
                     // Token is still valid
                     string? token = await sessionStorage.GetItemAsync<string>("authToken");
-                    return Result<string>.Success(token!);
+                    return Result.Success(token);
                 }
             }
             catch (Exception ex)
             {
-                return Result<string>.Failure<string>(new Error("IdentityMgmtRepository.RefreshAuthTokenAsync", ex.Message));
+                return Result.Failure<string>(new Error("IdentityMgmtRepository.RefreshAuthTokenAsync", ex.Message));
             }
         }
 
@@ -129,11 +129,11 @@ namespace CloudAccounting.Wasm.Services.Repositories.Authentication
 
                     if (response is not null)
                     {
-                        return Result<ApplicationUser>.Success(response);
+                        return Result.Success(response);
                     }
                     else
                     {
-                        return Result<ApplicationUser>.Failure<ApplicationUser>(
+                        return Result.Failure<ApplicationUser>(
                             new Error("IdentityMgmtRepository.GetUserByIdAsync", "User not found")
                         );
                     }
@@ -141,15 +141,89 @@ namespace CloudAccounting.Wasm.Services.Repositories.Authentication
                 else
                 {
                     var errorContent = await result.Content.ReadAsStringAsync();
-                    return Result<ApplicationUser>.Failure<ApplicationUser>(
+                    return Result.Failure<ApplicationUser>(
                         new Error("IdentityMgmtRepository.GetUserByIdAsync", errorContent)
                     );
                 }
             }
             catch (Exception ex)
             {
-                return Result<ApplicationUser>.Failure<ApplicationUser>(
+                return Result.Failure<ApplicationUser>(
                     new Error("IdentityMgmtRepository.GetUserByIdAsync", ex.Message)
+                );
+            }
+        }
+
+        public async Task<Result<List<ApplicationUser>>> LoadUsersByCompanyAndGroupAsync(int companyCode, int groupId)
+        {
+            try
+            {
+                var result = await _httpClient.GetAsync($"{uri}users/{companyCode}/{groupId}");
+
+                if (result.IsSuccessStatusCode)
+                {
+                    var response = await result.Content.ReadFromJsonAsync<List<ApplicationUser>>();
+
+                    if (response is not null)
+                    {
+                        return Result.Success(response);
+                    }
+                    else
+                    {
+                        return Result.Failure<List<ApplicationUser>>(
+                            new Error("IdentityMgmtRepository.GetUsersByCompanyAsync", "No users found for the specified company and group")
+                        );
+                    }
+                }
+                else
+                {
+                    var errorContent = await result.Content.ReadAsStringAsync();
+                    return Result.Failure<List<ApplicationUser>>(
+                        new Error("IdentityMgmtRepository.GetUsersByCompanyAsync", errorContent)
+                    );
+                }
+            }
+            catch (Exception ex)
+            {
+                return Result.Failure<List<ApplicationUser>>(
+                    new Error("IdentityMgmtRepository.GetUsersByCompanyAsync", ex.Message)
+                );
+            }
+        }
+
+        public async Task<Result<List<RoleModel>>> GetAllRolesAsync()
+        {
+            try
+            {
+                var result = await _httpClient.GetAsync($"{uri}roles");
+
+                if (result.IsSuccessStatusCode)
+                {
+                    var response = await result.Content.ReadFromJsonAsync<List<RoleModel>>();
+
+                    if (response is not null)
+                    {
+                        return Result.Success(response);
+                    }
+                    else
+                    {
+                        return Result.Failure<List<RoleModel>>(
+                            new Error("IdentityMgmtRepository.GetAllRolesAsync", "No roles found")
+                        );
+                    }
+                }
+                else
+                {
+                    var errorContent = await result.Content.ReadAsStringAsync();
+                    return Result.Failure<List<RoleModel>>(
+                        new Error("IdentityMgmtRepository.GetAllRolesAsync", errorContent)
+                    );
+                }
+            }
+            catch (Exception ex)
+            {
+                return Result.Failure<List<RoleModel>>(
+                    new Error("IdentityMgmtRepository.GetAllRolesAsync", ex.Message)
                 );
             }
         }

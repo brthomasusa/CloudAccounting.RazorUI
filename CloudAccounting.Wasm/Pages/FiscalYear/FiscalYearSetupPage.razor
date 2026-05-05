@@ -1,6 +1,6 @@
 ﻿@page "/Pages/FiscalYear/FiscalYearSetupPage"
 @using CloudAccounting.Wasm.Components
-@using Radzen
+
 
 <PageTitle>Fiscal Year Setup</PageTitle>
 
@@ -9,7 +9,7 @@
 <ErrorBoundary>
     <ChildContent>
         <RadzenCard Variant="Variant.Text" class="rz-p-0 rz-m-0">
-            <RadzenTemplateForm Data="@_fiscalYearCommand" Submit="@(async (CreateFiscalYearCommand args) => { await Submit(args); })">
+            <RadzenTemplateForm TItem="CreateFiscalYearCommand" Data="@_fiscalYearCommand" Submit="@(async ( args) => { await Submit(args); })">
                 <RadzenRow Gap="2rem" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.Center" class="rz-p-0 rz-p-lg-4">
                     <RadzenColumn Size="4">
                         <RadzenStack Orientation="Orientation.Vertical" Gap="0.5rem">
@@ -96,7 +96,7 @@
                                                             Data="@(_fiscalYearDto.FiscalPeriods)"
                                                             IsLoading="@_isLoading"
                                                             LoadData="@GetFiscalPeriods"
-                                                            Count="@(_fiscalYearDto.FiscalPeriods!.Count)"
+                                                            Count="@(_fiscalYearDto.FiscalPeriods.Count)"
                                                             Density="Density.Compact"
                                                             AllowAlternatingRows="true">
                                                         

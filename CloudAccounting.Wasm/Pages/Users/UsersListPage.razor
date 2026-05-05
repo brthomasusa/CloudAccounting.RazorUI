@@ -1,112 +1,47 @@
 
 @page "/Pages/Users/UsersListPage"
+@using CloudAccounting.Wasm.Models.Authentication
 
-@using CloudAccounting.Wasm.Components
-@inject HttpClient Http
-@inject IJSRuntime JsRuntime
+<PageTitle>Users & Roles</PageTitle>
 
-<div class="container-fluid">
-    <div class="row mb-3">
-        <div class="col-md-6">
-            <h2>Users</h2>
-        </div>
-        <div class="col-md-6 text-end">
-            <a href="/users/new" class="btn btn-primary">Add User</a>
-        </div>
-    </div>
+<RadzenText TextStyle="TextStyle.Subtitle1">Manage Users and Roles</RadzenText>
 
-    @if (users == null)
-    {
-        <div class="alert alert-info">Loading...</div>
-    }
-    else if (users.Count == 0)
-    {
-        <div class="alert alert-warning">No users found.</div>
-    }
-    else
-    {
-        <div class="table-responsive">
-            <table class="table table-striped table-hover">
-                <thead class="table-dark">
-                    <tr>
-                        <th>ID</th>
-                        <th>Name</th>
-                        <th>Email</th>
-                        <th>Status</th>
-                        <th>Actions</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach (var user in users)
-                    {
-                        <tr>
-                            <td>@user.Id</td>
-                            <td>@user.Name</td>
-                            <td>@user.Email</td>
-                            <td>
-                                @if (user.IsActive)
-                                {
-                                    <span class="badge bg-success">Active</span>
-                                }
-                                else
-                                {
-                                    <span class="badge bg-danger">Inactive</span>
-                                }
-                            </td>
-                            <td>
-                                <a href="/users/@user.Id/edit" class="btn btn-sm btn-warning">Edit</a>
-                                <button @onclick="() => DeleteUser(user.Id)" class="btn btn-sm btn-danger">Delete</button>
-                            </td>
-                        </tr>
-                    }
-                </tbody>
-            </table>
-        </div>
-    }
-</div>
+<ErrorBoundary>
+    <ChildContent>
+        <RadzenRow class="rz-mt-5">
+            <RadzenColumn Size="4">
+                <RadzenStack Orientation="Orientation.Vertical" Gap="0.5rem">
+                    <RadzenLabel class="rz-m-0" TextStyle="TextStyle.Subtitle2">Roles</RadzenLabel>
+                    <RadzenCard Variant="Variant.Outlined" class="rz-p-0 rz-m-0">
+                        <RadzenTree Data=@_roles Expand=@OnExpand Change=@OnChange Style="width: 100%; height: 300px">
+                            <RadzenTreeLevel TextProperty="@nameof(RoleModel.GroupTitle)" />
+                        </RadzenTree>
+                    </RadzenCard>
+                </RadzenStack>
+            </RadzenColumn>
+            <RadzenColumn Size="8">
+                <RadzenStack Orientation="Orientation.Vertical" Gap="0.5rem">
+                    <RadzenLabel class="rz-m-0" TextStyle="TextStyle.Subtitle2">Users in Selected Role</RadzenLabel>
+                    <RadzenCard Variant="Variant.Outlined" class="rz-p-0 rz-m-0">
+                        @if (_selectedCompanyCode > 0)
+                        {
+                            <p class="rz-p-3">Select a group to view its users.</p>
+                        }
+                        else
+                        {
+                            <p class="rz-p-3">No group selected.</p>
+                        }
+                    </RadzenCard>
+                </RadzenStack>
+            </RadzenColumn>
+        </RadzenRow>
 
-@code {
-    private List<UserDto> users;
-
-    protected override async Task OnInitializedAsync()
-    {
-        await LoadUsers();
-    }
-
-    private async Task LoadUsers()
-    {
-        try
-        {
-            users = await Http.GetFromJsonAsync<List<UserDto>>("api/users");
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine($"Error loading users: {ex.Message}");
-            users = new List<UserDto>();
-        }
-    }
-
-    private async Task DeleteUser(int id)
-    {
-        if (await JsRuntime.InvokeAsync<bool>("confirm", "Are you sure you want to delete this user?"))
-        {
-            try
-            {
-                await Http.DeleteAsync($"api/users/{id}");
-                await LoadUsers();
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Error deleting user: {ex.Message}");
-            }
-        }
-    }
-
-    public class UserDto
-    {
-        public int Id { get; set; }
-        public string Name { get; set; }
-        public string Email { get; set; }
-        public bool IsActive { get; set; }
-    }
-}
+        <RadzenAlert Visible="@_showErrorAlert" Title="@_errorAlertTitle" AlertStyle="AlertStyle.Danger"
+                     Variant="Variant.Flat" Shade="Shade.Lighter" AllowClose="true" Close="@OnAlertClose">
+            @_errorAlertMessage
+        </RadzenAlert>
+    </ChildContent>
+    <ErrorContent Context="ex">
+        <p class="errorUI">An error has occurred: @ex.Message</p>
+    </ErrorContent>
+</ErrorBoundary>

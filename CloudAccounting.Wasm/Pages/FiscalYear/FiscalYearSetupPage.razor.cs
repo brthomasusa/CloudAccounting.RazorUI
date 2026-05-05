@@ -13,20 +13,20 @@ namespace CloudAccounting.Wasm.Pages.FiscalYear
         [Inject] private IAuthenticatedUserState? AuthenticatedUserState { get; set; }
 
         private CreateFiscalYearCommand _fiscalYearCommand = new(0,0,DateTime.MinValue);
-        private FiscalYearDto? _fiscalYearDto = null;
+        private FiscalYearDto? _fiscalYearDto;
         private int _selectedCompanyCode;
         private bool _disableFiscalYearDeleteButton = true;
         private bool _disableGenerateFiscalYearButton = true;
-        private bool _showErrorAlert = false;
+        private bool _showErrorAlert;
         private string _errorAlertMessage = string.Empty;
         private string _errorAlertTitle = string.Empty;
-        private bool _isLoading = false;
+        private bool _isLoading;
 
-        protected async override Task OnInitializedAsync()
+        protected override async Task OnInitializedAsync()
         {
             try
             {
-                int companyCode = AuthenticatedUserState!.GetUser().CompanyCode;
+                var companyCode = AuthenticatedUserState!.GetUser().CompanyCode;
                 _fiscalYearCommand.CompanyCode = companyCode;
 
                 await GetCurrentFiscalYear(companyCode);
@@ -111,13 +111,13 @@ namespace CloudAccounting.Wasm.Pages.FiscalYear
 
             int companyCode = _fiscalYearDto!.CompanyCode;
             int fiscalYear = _fiscalYearDto.Year;
-            string companyName = _fiscalYearDto.CompanyName!;
+            string companyName = _fiscalYearDto.CompanyName;
 
             string msg = $"Do you wish to delete fiscal year {fiscalYear} for {companyName}? This can't be undone!";
 
-            var dialogResponse = await DialogService!.Confirm(msg, $"Delete fiscal year?", new ConfirmOptions() { OkButtonText = "Yes", CancelButtonText = "No" });
+            var dialogResponse = await DialogService!.Confirm(msg, "Delete fiscal year?", new ConfirmOptions() { OkButtonText = "Yes", CancelButtonText = "No" });
 
-            if ((bool)dialogResponse)
+            if ((bool)dialogResponse!)
             {
                 Result result = 
                     await CompanyService!.DeleteCompanyFiscalYearAsync(companyCode, fiscalYear);
@@ -178,11 +178,6 @@ namespace CloudAccounting.Wasm.Pages.FiscalYear
                 _errorAlertMessage = result.Error.Message;
                 _showErrorAlert = true;
             }
-        }
-
-        private static bool ValidateCompanyCode(int companyCode)
-        {
-            return companyCode > 0;
         }
 
         private bool ValidateFiscalYear(int fiscalYear)
