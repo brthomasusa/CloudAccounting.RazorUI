@@ -14,13 +14,13 @@ namespace CloudAccounting.Wasm.Pages.VoucherTypes
 
         private VoucherTypeCommand? _voucherTypeCmd;
         private readonly List<VoucherTypeClassification> _voucherTypeClassifications = VoucherTypeClassificationList.Classifications;
-        private string? _voucherTitle;
-        private bool _showErrorAlert = false;
+
+        private bool _showErrorAlert;
         private string _errorAlertMessage = string.Empty;
         private string _errorAlertTitle = string.Empty;
-        private bool _hasUnsavedChanges = false;
+        private bool _hasUnsavedChanges;
 
-        protected async override Task OnInitializedAsync()
+        protected override async Task OnInitializedAsync()
         {
             _voucherTypeCmd = new VoucherTypeCommand() 
             { 

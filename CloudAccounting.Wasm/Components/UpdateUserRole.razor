@@ -1,0 +1,49 @@
+@using CloudAccounting.Wasm.Models.Authentication
+
+<ErrorBoundary>
+    <ChildContent>
+        <RadzenStack Orientation="Orientation.Vertical" class="rz-mz-2 rz-my-2" JustifyContent="JustifyContent.Center"
+                     Gap="0.5rem">            
+            <RadzenLabel class="rz-m-0" TextStyle="TextStyle.Subtitle2">Update User's Role Assignment</RadzenLabel>
+            <RadzenCard Variant="Variant.Text" class="rz-p-0 rz-m-0">
+                <RadzenTemplateForm TItem="UpdateUserRoleCommand" Data="@User" Submit="@OnUpdateUserRole">
+                    <RadzenStack Orientation="Orientation.Vertical">                        
+                        <RadzenTextBox Value="@User.Email" Style="width: 50%;" Name="email" ReadOnly="true" />                                    
+
+                        @if (Roles.Count > 0)
+                        {
+                            <RadzenDropDown @bind-Value="@User.RoleName" Data="@Roles" TItem="RoleModel"
+                                            TValue="string" TextProperty="@nameof(RoleModel.GroupTitle)"
+                                            ValueProperty="@nameof(RoleModel.GroupTitle)" Style="width: 50%;"
+                                            Placeholder="Select a role" Name="rolesDropDown" />
+                        }
+                        
+                        <RadzenStack Orientation="Orientation.Horizontal" Gap="0.5rem">
+                            <RadzenCheckBox TValue="bool" @bind-Value="@User.IsCompanyAdmin"
+                                            Name="isCompanyAdminCheckBox" />
+                            <RadzenLabel Text="Company Admin?" Component="isCompanyAdminCheckBox" />
+                        </RadzenStack>
+                        <RadzenButton ButtonType="ButtonType.Submit" ButtonStyle="ButtonStyle.Success"
+                                      Size="ButtonSize.Medium" Icon="save" Text="Apply Changes" class="rz-mt-2 rz-mb-5"
+                                      Style="width: 175px;" />
+                    </RadzenStack>
+                </RadzenTemplateForm>
+            </RadzenCard>
+        </RadzenStack>
+    </ChildContent>
+    <ErrorContent Context="ex">
+        <p class="errorUI">An error has occurred: @ex.Message</p>
+    </ErrorContent>
+</ErrorBoundary>
+
+@code {
+
+    [Parameter] public required UpdateUserRoleCommand User { get; set; }
+    [Parameter] public required List<RoleModel> Roles { get; set; }
+    [Parameter] public EventCallback<UpdateUserRoleCommand> OnUserUpdated { get; set; }
+
+    private async Task OnUpdateUserRole()
+    {
+        await OnUserUpdated.InvokeAsync(User);
+    }
+}

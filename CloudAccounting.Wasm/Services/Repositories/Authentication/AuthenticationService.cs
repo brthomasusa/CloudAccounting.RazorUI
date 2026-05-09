@@ -9,19 +9,19 @@ namespace CloudAccounting.Wasm.Services.Repositories.Authentication
     public class AuthenticationService
     (
         AuthenticationStateProvider authenticationStateProvider,
-        IHttpClientFactory ClientFactory,
+        IHttpClientFactory clientFactory,
         ISessionStorageService sessionStorage
 
     ) : IAuthenticationService
     {
-        const string uri = "/api/v1/identity/";
-        private readonly HttpClient _httpClient = ClientFactory.CreateClient("WithoutDelegateHandler");
+        const string Uri = "/api/v1/identity/";
+        private readonly HttpClient _httpClient = clientFactory.CreateClient("WithoutDelegateHandler");
 
         public async Task<Result<LoginResponseModel>> LoginAsync(LoginCommand request)
         {
             try
             {
-                var response = await _httpClient.PostAsJsonAsync($"{uri}login", request);
+                var response = await _httpClient.PostAsJsonAsync($"{Uri}login", request);
 
                 if (response.IsSuccessStatusCode)
                 {
@@ -66,8 +66,8 @@ namespace CloudAccounting.Wasm.Services.Repositories.Authentication
 
                 var exp = user.FindFirst(c => c.Type.Equals("exp"))!.Value;
                 var expTime = DateTimeOffset.FromUnixTimeSeconds(Convert.ToInt64(exp));
-                var timeUTC = DateTime.UtcNow;
-                var diff = expTime - timeUTC;
+                var timeUtc = DateTime.UtcNow;
+                var diff = expTime - timeUtc;
 
                 if (diff.TotalMinutes <= 2)
                 {
@@ -80,7 +80,7 @@ namespace CloudAccounting.Wasm.Services.Repositories.Authentication
                         return Result.Failure<string>(new Error("IdentityMgmtRepository.RefreshAuthTokenAsync", "No refresh token found"));
                     }
 
-                    var response = await _httpClient.PostAsJsonAsync($"{uri}loginbyrefreshtoken", new { RefreshToken = refreshToken });
+                    var response = await _httpClient.PostAsJsonAsync($"{Uri}loginbyrefreshtoken", new { RefreshToken = refreshToken });
 
                     if (response.IsSuccessStatusCode)
                     {
@@ -107,7 +107,7 @@ namespace CloudAccounting.Wasm.Services.Repositories.Authentication
                 else
                 {
                     // Token is still valid
-                    string? token = await sessionStorage.GetItemAsync<string>("authToken");
+                    string token = await sessionStorage.GetItemAsync<string>("authToken");
                     return Result.Success(token);
                 }
             }
@@ -121,7 +121,7 @@ namespace CloudAccounting.Wasm.Services.Repositories.Authentication
         {
             try
             {
-                var result = await _httpClient.GetAsync($"{uri}users/{userId}");
+                var result = await _httpClient.GetAsync($"{Uri}users/{userId}");
 
                 if (result.IsSuccessStatusCode)
                 {
@@ -154,11 +154,11 @@ namespace CloudAccounting.Wasm.Services.Repositories.Authentication
             }
         }
 
-        public async Task<Result<List<ApplicationUser>>> LoadUsersByCompanyAndGroupAsync(int companyCode, int groupId)
+        public async Task<Result<List<ApplicationUser>>> GetUsersByCompanyAndGroupAsync(int companyCode, int groupId)
         {
             try
             {
-                var result = await _httpClient.GetAsync($"{uri}users/{companyCode}/{groupId}");
+                var result = await _httpClient.GetAsync($"{Uri}users/{companyCode}/{groupId}");
 
                 if (result.IsSuccessStatusCode)
                 {
@@ -195,7 +195,7 @@ namespace CloudAccounting.Wasm.Services.Repositories.Authentication
         {
             try
             {
-                var result = await _httpClient.GetAsync($"{uri}roles");
+                var result = await _httpClient.GetAsync($"{Uri}roles");
 
                 if (result.IsSuccessStatusCode)
                 {
@@ -225,6 +225,72 @@ namespace CloudAccounting.Wasm.Services.Repositories.Authentication
                 return Result.Failure<List<RoleModel>>(
                     new Error("IdentityMgmtRepository.GetAllRolesAsync", ex.Message)
                 );
+            }
+        }
+
+        public async Task<Result> CreateRoleAsync(RoleModel role)
+        {
+            try
+            {
+                var result = await _httpClient.PostAsJsonAsync($"{Uri}roles", new { RoleName = role.GroupTitle });
+
+                if (result.IsSuccessStatusCode)
+                {
+                    return Result.Success();
+                }
+                else
+                {
+                    var errorContent = await result.Content.ReadAsStringAsync();
+                    return Result.Failure(new Error("IdentityMgmtRepository.CreateRoleAsync", errorContent));
+                }
+            }
+            catch (Exception ex)
+            {
+                return Result.Failure(new Error("IdentityMgmtRepository.CreateRoleAsync", ex.Message));
+            }
+        }
+
+        public async Task<Result> CreateUserWithRoleAsync(CreateUserWithRoleCommand command)
+        {
+            try
+            {
+                var result = await _httpClient.PostAsJsonAsync($"{Uri}users/withrole", command);
+
+                if (result.IsSuccessStatusCode)
+                {
+                    return Result.Success();
+                }
+                else
+                {
+                    var errorContent = await result.Content.ReadAsStringAsync();
+                    return Result.Failure(new Error("IdentityMgmtRepository.CreateUserWithRoleAsync", errorContent));
+                }
+            }
+            catch (Exception ex)
+            {
+                return Result.Failure(new Error("IdentityMgmtRepository.CreateUserWithRoleAsync", ex.Message));
+            }
+        }
+
+        public async Task<Result> UpdateUserRoleAsync(UpdateUserRoleCommand command)
+        {
+            try
+            {
+                var result = await _httpClient.PutAsJsonAsync($"{Uri}users/updaterole", command);
+
+                if (result.IsSuccessStatusCode)
+                {
+                    return Result.Success();
+                }
+                else
+                {
+                    var errorContent = await result.Content.ReadAsStringAsync();
+                    return Result.Failure(new Error("IdentityMgmtRepository.UpdateUserRoleAsync", errorContent));
+                }
+            }
+            catch (Exception ex)
+            {
+                return Result.Failure(new Error("IdentityMgmtRepository.UpdateUserRoleAsync", ex.Message));
             }
         }
     }

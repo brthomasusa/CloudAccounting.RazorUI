@@ -1,0 +1,62 @@
+
+@using CloudAccounting.Wasm.Models.Authentication
+
+<ErrorBoundary >
+    <ChildContent>
+        <RadzenStack Orientation="Orientation.Vertical" class="rz-mz-2 rz-my-2" JustifyContent="JustifyContent.Center"
+                     Gap="0.5rem">
+            <RadzenLabel class="rz-m-0" TextStyle="TextStyle.Subtitle2">Create User with Role</RadzenLabel>
+            <RadzenCard Variant="Variant.Text" class="rz-p-0 rz-m-0">
+                <RadzenTemplateForm TItem="CreateUserWithRoleCommand" Data="@_newUserCommand"
+                                    Submit="@OnCreateUserWithRole">
+                    <RadzenStack Orientation="Orientation.Vertical">
+                        <RadzenTextBox @bind-Value="_newUserCommand.Email" Placeholder="Enter email" Style="width: 50%;"
+                                       Name="email" />
+                        <RadzenRequiredValidator Component="email" Text="An email address is required."
+                                                 Style="position: absolute" />
+                        <RadzenEmailValidator Component="email" Text="Provide a valid email address"
+                                              Style="position: absolute" />
+                        <RadzenPassword Name="password" @bind-Value="_newUserCommand.Password"
+                                        Placeholder="Enter password" Style="width: 50%;" />
+                        <RadzenRequiredValidator Component="password" Text="A password is required."
+                                                 Style="position: absolute" />
+                        @if (Roles.Count > 0)
+                        {
+                            <RadzenDropDown @bind-Value="@_newUserCommand.RoleName" Data="@Roles" TItem="RoleModel"
+                                            TValue="string" TextProperty="@nameof(RoleModel.GroupTitle)"
+                                            ValueProperty="@nameof(RoleModel.GroupTitle)" Style="width: 50%;"
+                                            Placeholder="Select a role" Name="rolesDropDown" />
+                        }
+                        <RadzenStack Orientation="Orientation.Horizontal" Gap="0.5rem">
+                            <RadzenCheckBox TValue="bool" value="@_newUserCommand.IsCompanyAdmin"
+                                            Name="isCompanyAdminCheckBox" />
+                            <RadzenLabel Text="Company Admin?" Component="isCompanyAdminCheckBox" />
+                        </RadzenStack>
+                        <RadzenButton ButtonType="ButtonType.Submit" ButtonStyle="ButtonStyle.Success"
+                                      Size="ButtonSize.Small" Icon="save" Text="Save" class="rz-mt-2 rz-mb-5"
+                                      Style="width: 150px;" />
+                    </RadzenStack>
+                </RadzenTemplateForm>
+            </RadzenCard>
+        </RadzenStack>
+    </ChildContent>
+    <ErrorContent Context="ex">
+        <p class="errorUI">An error has occurred: @ex.Message</p>
+    </ErrorContent>
+</ErrorBoundary>
+
+@code {
+    private CreateUserWithRoleCommand _newUserCommand = new();
+
+    [Parameter] public required int SelectedCompanyCode { get; set; }
+    [Parameter] public required List<RoleModel> Roles { get; set; }
+    [Parameter] public EventCallback<CreateUserWithRoleCommand> OnUserCreated { get; set; }
+
+    private async Task OnCreateUserWithRole()
+    {
+        _newUserCommand.CompanyCode = SelectedCompanyCode;
+
+        await OnUserCreated.InvokeAsync(_newUserCommand);
+        _newUserCommand = new CreateUserWithRoleCommand { CompanyCode = SelectedCompanyCode };
+    }
+}

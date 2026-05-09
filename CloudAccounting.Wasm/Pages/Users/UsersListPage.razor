@@ -1,37 +1,54 @@
 
 @page "/Pages/Users/UsersListPage"
 @using CloudAccounting.Wasm.Models.Authentication
+@using CloudAccounting.Wasm.Components
+
 
 <PageTitle>Users & Roles</PageTitle>
 
-<RadzenText TextStyle="TextStyle.Subtitle1">Manage Users and Roles</RadzenText>
+<RadzenText TextStyle="TextStyle.Subtitle1">Manage Roles & Users</RadzenText>
 
 <ErrorBoundary>
     <ChildContent>
         <RadzenRow class="rz-mt-5">
-            <RadzenColumn Size="4">
-                <RadzenStack Orientation="Orientation.Vertical" Gap="0.5rem">
-                    <RadzenLabel class="rz-m-0" TextStyle="TextStyle.Subtitle2">Roles</RadzenLabel>
+            <RadzenColumn Size="4" class="rz-mr-6">
+                <RadzenStack Orientation="Orientation.Vertical" Gap="0.5rem" JustifyContent="JustifyContent.Center">
+                    <RadzenLabel class="rz-mt-3 rz-mb-5" TextStyle="TextStyle.Subtitle2">Roles</RadzenLabel>
+                    <RadzenTemplateForm TItem="RoleModel" Data="@_newRoleModel" Submit="@OnCreateRole">
+                        <RadzenTextBox @bind-Value="_newRoleModel.GroupTitle" Placeholder="Enter new role name" Style="width: 100%;" />
+                        <RadzenButton ButtonType="ButtonType.Submit" ButtonStyle="ButtonStyle.Success"
+                                      Size="ButtonSize.Medium" Icon="save" Text="Save" class="rz-mt-2 rz-mb-5" />
+                    </RadzenTemplateForm>
                     <RadzenCard Variant="Variant.Outlined" class="rz-p-0 rz-m-0">
-                        <RadzenTree Data=@_roles Expand=@OnExpand Change=@OnChange Style="width: 100%; height: 300px">
+                        <RadzenTree Data="@_roles" Expand="@OnExpand" Change="@OnChange" Style="width: 100%; height: 300px">
                             <RadzenTreeLevel TextProperty="@nameof(RoleModel.GroupTitle)" />
                         </RadzenTree>
                     </RadzenCard>
                 </RadzenStack>
             </RadzenColumn>
-            <RadzenColumn Size="8">
-                <RadzenStack Orientation="Orientation.Vertical" Gap="0.5rem">
-                    <RadzenLabel class="rz-m-0" TextStyle="TextStyle.Subtitle2">Users in Selected Role</RadzenLabel>
-                    <RadzenCard Variant="Variant.Outlined" class="rz-p-0 rz-m-0">
-                        @if (_selectedCompanyCode > 0)
+            
+            <RadzenColumn Size="6">
+                <RadzenStack Orientation="Orientation.Vertical">
+                    <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.SpaceBetween"
+                                 AlignItems="AlignItems.Center">
+                        <RadzenLabel class="rz-m-0" TextStyle="TextStyle.Subtitle2">Users</RadzenLabel>
+                        <RadzenButton ButtonStyle="ButtonStyle.Info" Click="ShowCreateUserForm"
+                                      class="rz-border-radius-10 rz-shadow-6 rz-mb-4" Size="ButtonSize.ExtraSmall" Icon="add_circle"
+                                      Style="width: 50px;" />
+                    </RadzenStack>
+
+                    @if (_roles != null)
+                    {
+                        if (_showUpdateComponent)
                         {
-                            <p class="rz-p-3">Select a group to view its users.</p>
+                            <UpdateUserRole User="@_updateUserRoleCommand" Roles="@_roles" OnUserUpdated="@OnUserUpdated"/>
                         }
                         else
                         {
-                            <p class="rz-p-3">No group selected.</p>
+                            <CreateUserAndRole SelectedCompanyCode="@_selectedCompanyCode" Roles="@_roles"
+                                               OnUserCreated="@OnCreateUserWithRole"/>
                         }
-                    </RadzenCard>
+                    }
                 </RadzenStack>
             </RadzenColumn>
         </RadzenRow>
