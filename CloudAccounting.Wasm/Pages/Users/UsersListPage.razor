@@ -19,7 +19,7 @@
                         <RadzenButton ButtonType="ButtonType.Submit" ButtonStyle="ButtonStyle.Success"
                                       Size="ButtonSize.Medium" Icon="save" Text="Save" class="rz-mt-2 rz-mb-5" />
                     </RadzenTemplateForm>
-                    <RadzenCard Variant="Variant.Outlined" class="rz-p-0 rz-m-0">
+                    <RadzenCard Variant="Variant.Outlined" class="rz-p-2 rz-m-0">
                         <RadzenTree Data="@_roles" Expand="@OnExpand" Change="@OnChange" Style="width: 100%; height: 300px">
                             <RadzenTreeLevel TextProperty="@nameof(RoleModel.GroupTitle)" />
                         </RadzenTree>
@@ -27,14 +27,14 @@
                 </RadzenStack>
             </RadzenColumn>
             
-            <RadzenColumn Size="6">
+            <RadzenColumn Size="5">
                 <RadzenStack Orientation="Orientation.Vertical">
                     <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.SpaceBetween"
                                  AlignItems="AlignItems.Center">
                         <RadzenLabel class="rz-m-0" TextStyle="TextStyle.Subtitle2">Users</RadzenLabel>
                         <RadzenButton ButtonStyle="ButtonStyle.Info" Click="ShowCreateUserForm"
                                       class="rz-border-radius-10 rz-shadow-6 rz-mb-4" Size="ButtonSize.ExtraSmall" Icon="add_circle"
-                                      Style="width: 50px;" />
+                                      Style="width: 50px;" title="Add User" />
                     </RadzenStack>
 
                     @if (_roles != null)

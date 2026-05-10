@@ -254,7 +254,7 @@ namespace CloudAccounting.Wasm.Services.Repositories.Authentication
         {
             try
             {
-                var result = await _httpClient.PostAsJsonAsync($"{Uri}users/withrole", command);
+                var result = await _httpClient.PostAsJsonAsync($"{Uri}users", command);
 
                 if (result.IsSuccessStatusCode)
                 {
@@ -276,7 +276,7 @@ namespace CloudAccounting.Wasm.Services.Repositories.Authentication
         {
             try
             {
-                var result = await _httpClient.PutAsJsonAsync($"{Uri}users/updaterole", command);
+                var result = await _httpClient.PutAsJsonAsync($"{Uri}roles", command);
 
                 if (result.IsSuccessStatusCode)
                 {

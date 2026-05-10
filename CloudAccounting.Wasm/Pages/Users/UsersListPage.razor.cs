@@ -84,9 +84,7 @@ namespace CloudAccounting.Wasm.Pages.Users
                 _updateUserRoleCommand = new UpdateUserRoleCommand
                 {
                     Email = user.UserId,
-                    RoleName = user.GroupTitle,
-                    IsCompanyAdmin = user.GroupTitle == "CompanyAdmin"
-                };
+                    RoleName = user.GroupTitle                };
             }
             else
             {

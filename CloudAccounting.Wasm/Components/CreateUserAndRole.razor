@@ -27,13 +27,8 @@
                                             ValueProperty="@nameof(RoleModel.GroupTitle)" Style="width: 50%;"
                                             Placeholder="Select a role" Name="rolesDropDown" />
                         }
-                        <RadzenStack Orientation="Orientation.Horizontal" Gap="0.5rem">
-                            <RadzenCheckBox TValue="bool" value="@_newUserCommand.IsCompanyAdmin"
-                                            Name="isCompanyAdminCheckBox" />
-                            <RadzenLabel Text="Company Admin?" Component="isCompanyAdminCheckBox" />
-                        </RadzenStack>
                         <RadzenButton ButtonType="ButtonType.Submit" ButtonStyle="ButtonStyle.Success"
-                                      Size="ButtonSize.Small" Icon="save" Text="Save" class="rz-mt-2 rz-mb-5"
+                                      Size="ButtonSize.Medium" Icon="save" Text="Save" class="rz-mt-2 rz-mb-5"
                                       Style="width: 150px;" />
                     </RadzenStack>
                 </RadzenTemplateForm>
