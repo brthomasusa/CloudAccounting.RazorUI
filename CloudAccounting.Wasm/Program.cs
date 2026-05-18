@@ -3,10 +3,10 @@ using Blazored.LocalStorage;
 using Blazored.SessionStorage;
 using CloudAccounting.Wasm;
 using CloudAccounting.Wasm.Authentication;
-using CloudAccounting.Wasm.Services.ApplicationState;
 using CloudAccounting.Wasm.Services.DelegatingHandlers;
 using CloudAccounting.Wasm.Services.Repositories.Authentication;
 using CloudAccounting.Wasm.Services.Repositories.Company;
+using CloudAccounting.Wasm.Services.Repositories.CostCenters;
 using CloudAccounting.Wasm.Services.Repositories.VoucherTypes;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Components.Web;
@@ -38,6 +38,7 @@ builder.Services.AddScoped<ICompanyService, CompanyService>()
                 .AddScoped<IVoucherTypeService, VoucherTypeService>()
                 .AddScoped<ILookupService, LookupService>()
                 .AddScoped<IAuthenticationService, AuthenticationService>()
+                .AddScoped<ICostCenterService, CostCenterService>()
                 .AddSingleton<IAuthenticatedUserState, AuthenticatedUserState>();
 
 builder.Services.AddRadzenComponents()

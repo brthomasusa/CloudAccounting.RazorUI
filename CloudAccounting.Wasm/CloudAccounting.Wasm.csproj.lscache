@@ -1,0 +1,447 @@
+version=1
+
+# This file caches language service data to improve the performance of C# Dev Kit.
+# It is not intended for manual editing. It can safely be deleted and will be
+# regenerated automatically. For more information, see https://aka.ms/lscache
+#
+# To control where cache files are stored, use the following VS Code setting:
+#   "dotnet.projectsystem.cacheInProjectFolder": true
+
+[project]
+language=C#
+primary
+lastDtbSucceeded
+
+[properties]
+AssemblyName=CloudAccounting.Wasm
+CommandLineArgsForDesignTimeEvaluation=-langversion:14.0 -define:TRACE
+CompilerGeneratedFilesOutputPath=
+MaxSupportedLangVersion=14.0
+ProjectAssetsFile=<PATH>obj/project.assets.json
+RootNamespace=CloudAccounting.Wasm
+RunAnalyzers=
+RunAnalyzersDuringLiveAnalysis=
+SolutionPath=<PATH>../CloudAccounting.UI.slnx
+TargetFrameworkIdentifier=.NETCoreApp
+TargetPath=<PATH>bin/Debug/net10.0/CloudAccounting.Wasm.dll
+TargetRefPath=<PATH>obj/Debug/net10.0/ref/CloudAccounting.Wasm.dll
+TemporaryDependencyNodeTargetIdentifier=net10.0
+
+[commandLineArguments]
+/noconfig
+/unsafe-
+/checked-
+/nowarn:1701,1702,IL2121,1701,1702,8002
+/fullpaths
+/nostdlib+
+/platform:AnyCPU
+/errorreport:prompt
+/warn:10
+/define:TRACE;DEBUG;NET;NET10_0;NETCOREAPP;NET5_0_OR_GREATER;NET6_0_OR_GREATER;NET7_0_OR_GREATER;NET8_0_OR_GREATER;NET9_0_OR_GREATER;NET10_0_OR_GREATER;NETCOREAPP1_0_OR_GREATER;NETCOREAPP1_1_OR_GREATER;NETCOREAPP2_0_OR_GREATER;NETCOREAPP2_1_OR_GREATER;NETCOREAPP2_2_OR_GREATER;NETCOREAPP3_0_OR_GREATER;NETCOREAPP3_1_OR_GREATER
+/highentropyva+
+/nullable:enable
+/features:"InterceptorsNamespaces=;Microsoft.AspNetCore.Http.Generated;Microsoft.Extensions.Validation.Generated"
+/debug+
+/debug:portable
+/filealign:512
+/optimize-
+/out:obj\Debug\net10.0\CloudAccounting.Wasm.dll
+/refout:obj\Debug\net10.0\refint\CloudAccounting.Wasm.dll
+/target:exe
+/warnaserror-
+/utf8output
+/deterministic+
+/langversion:14.0
+/features:use-roslyn-tokenizer=true
+/warnaserror+:NU1605,SYSLIB0011
+
+[sourceFiles]
+Authentication/CustomAuthStateProvider.cs
+GlobalUsings.cs
+Models/Authentication/
+ ApplicationUser.cs
+ CreateUserWithRoleCommand.cs
+ LoginCommand.cs
+ LoginResponseModel.cs
+ RoleModel.cs
+ UpdateUserRoleCommand.cs
+Models/Common/
+ DocumentPage.cs
+ MetaData.cs
+Models/Company/
+ CompanyDetail.cs
+ CompanyWithFiscalPeriodsDto.cs
+ CreateFiscalYearCommand.cs
+ DeleteCompanyCommand.cs
+ DeleteFiscalYearCommand.cs
+ FiscalPeriodDto.cs
+ FiscalYearDto.cs
+ GetFiscalYearByCompanyAndYearQuery.cs
+Models/
+ CostCenters/CostCenterDto.cs
+ Lookups/
+  CompanyLookup.cs
+  MonthLookup.cs
+  MonthLookupList.cs
+  VoucherTypeClassification.cs
+  VoucherTypeClassificationList.cs
+ VoucherTypes/
+  VoucherTypeCommand.cs
+  VoucherTypeDeleteCommand.cs
+  VoucherTypeDto.cs
+  VoucherTypeEnum.cs
+obj/Debug/net10.0/
+ .NETCoreApp,Version=v10.0.AssemblyAttributes.cs
+ CloudAccounting.Wasm.AssemblyInfo.cs
+ CloudAccounting.Wasm.GlobalUsings.g.cs
+ EmbeddedAttribute.cs
+ ValidatableTypeAttribute.cs
+Pages/Company/
+ CompaniesListPage.razor.cs
+ CompanyCreatePage.razor.cs
+ CompanyEditPage.razor.cs
+Pages/CostCenters/
+ CostCentersEditPage.cs
+ CostCentersListPage.razor.cs
+Pages/
+ FiscalYear/FiscalYearSetupPage.razor.cs
+ Users/UsersListPage.razor.cs
+ VoucherTypes/
+  VoucherTypesCreatePage.razor.cs
+  VoucherTypesEditPage.razor.cs
+  VoucherTypesListPage.razor.cs
+Program.cs
+Services/ApplicationState/
+ AuthenticatedUserState.cs
+ IAuthenticatedUserState.cs
+Services/DelegatingHandlers/
+ AuthenticationDelegatingHandler.cs
+ LoggingDelegatingHandler.cs
+ RetryDelegatingHandler.cs
+Services/Repositories/Authentication/
+ AuthenticationService.cs
+ IAuthenticationService.cs
+Services/Repositories/Common/
+ ILookupService.cs
+ LookupService.cs
+Services/Repositories/Company/
+ CompanyService.cs
+ ICompanyService.cs
+Services/Repositories/CostCenters/
+ CostCenterService.cs
+ ICostCenterService.cs
+Services/Repositories/VoucherTypes/
+ IVoucherTypeService.cs
+ VoucherTypeService.cs
+Utilities/
+ DebuggingExtensions.cs
+ Error.cs
+ Helpers.cs
+ PhoneNumberUtility.cs
+ Result.cs
+ ResultT.cs
+ ShowErrorNotification.cs
+
+[metadataReferences]
+<DOTNET>/packs/Microsoft.NETCore.App.Ref/10.0.8/ref/net10.0/
+ Microsoft.CSharp.dll
+ Microsoft.VisualBasic.Core.dll
+ Microsoft.VisualBasic.dll
+ Microsoft.Win32.Primitives.dll
+ Microsoft.Win32.Registry.dll
+ mscorlib.dll
+ netstandard.dll
+ System.AppContext.dll
+ System.Buffers.dll
+ System.Collections.Concurrent.dll
+ System.Collections.dll
+ System.Collections.Immutable.dll
+ System.Collections.NonGeneric.dll
+ System.Collections.Specialized.dll
+ System.ComponentModel.Annotations.dll
+ System.ComponentModel.DataAnnotations.dll
+ System.ComponentModel.dll
+ System.ComponentModel.EventBasedAsync.dll
+ System.ComponentModel.Primitives.dll
+ System.ComponentModel.TypeConverter.dll
+ System.Configuration.dll
+ System.Console.dll
+ System.Core.dll
+ System.Data.Common.dll
+ System.Data.DataSetExtensions.dll
+ System.Data.dll
+ System.Diagnostics.Contracts.dll
+ System.Diagnostics.Debug.dll
+ System.Diagnostics.DiagnosticSource.dll
+ System.Diagnostics.FileVersionInfo.dll
+ System.Diagnostics.Process.dll
+ System.Diagnostics.StackTrace.dll
+ System.Diagnostics.TextWriterTraceListener.dll
+ System.Diagnostics.Tools.dll
+ System.Diagnostics.TraceSource.dll
+ System.Diagnostics.Tracing.dll
+ System.dll
+ System.Drawing.dll
+ System.Drawing.Primitives.dll
+ System.Dynamic.Runtime.dll
+ System.Formats.Asn1.dll
+ System.Formats.Tar.dll
+ System.Globalization.Calendars.dll
+ System.Globalization.dll
+ System.Globalization.Extensions.dll
+ System.IO.Compression.Brotli.dll
+ System.IO.Compression.dll
+ System.IO.Compression.FileSystem.dll
+ System.IO.Compression.ZipFile.dll
+ System.IO.dll
+ System.IO.FileSystem.AccessControl.dll
+ System.IO.FileSystem.dll
+ System.IO.FileSystem.DriveInfo.dll
+ System.IO.FileSystem.Primitives.dll
+ System.IO.FileSystem.Watcher.dll
+ System.IO.IsolatedStorage.dll
+ System.IO.MemoryMappedFiles.dll
+ System.IO.Pipelines.dll
+ System.IO.Pipes.AccessControl.dll
+ System.IO.Pipes.dll
+ System.IO.UnmanagedMemoryStream.dll
+ System.Linq.AsyncEnumerable.dll
+ System.Linq.dll
+ System.Linq.Expressions.dll
+ System.Linq.Parallel.dll
+ System.Linq.Queryable.dll
+ System.Memory.dll
+ System.Net.dll
+ System.Net.Http.dll
+ System.Net.Http.Json.dll
+ System.Net.HttpListener.dll
+ System.Net.Mail.dll
+ System.Net.NameResolution.dll
+ System.Net.NetworkInformation.dll
+ System.Net.Ping.dll
+ System.Net.Primitives.dll
+ System.Net.Quic.dll
+ System.Net.Requests.dll
+ System.Net.Security.dll
+ System.Net.ServerSentEvents.dll
+ System.Net.ServicePoint.dll
+ System.Net.Sockets.dll
+ System.Net.WebClient.dll
+ System.Net.WebHeaderCollection.dll
+ System.Net.WebProxy.dll
+ System.Net.WebSockets.Client.dll
+ System.Net.WebSockets.dll
+ System.Numerics.dll
+ System.Numerics.Vectors.dll
+ System.ObjectModel.dll
+ System.Reflection.DispatchProxy.dll
+ System.Reflection.dll
+ System.Reflection.Emit.dll
+ System.Reflection.Emit.ILGeneration.dll
+ System.Reflection.Emit.Lightweight.dll
+ System.Reflection.Extensions.dll
+ System.Reflection.Metadata.dll
+ System.Reflection.Primitives.dll
+ System.Reflection.TypeExtensions.dll
+ System.Resources.Reader.dll
+ System.Resources.ResourceManager.dll
+ System.Resources.Writer.dll
+ System.Runtime.CompilerServices.Unsafe.dll
+ System.Runtime.CompilerServices.VisualC.dll
+ System.Runtime.dll
+ System.Runtime.Extensions.dll
+ System.Runtime.Handles.dll
+ System.Runtime.InteropServices.dll
+ System.Runtime.InteropServices.JavaScript.dll
+ System.Runtime.InteropServices.RuntimeInformation.dll
+ System.Runtime.Intrinsics.dll
+ System.Runtime.Loader.dll
+ System.Runtime.Numerics.dll
+ System.Runtime.Serialization.dll
+ System.Runtime.Serialization.Formatters.dll
+ System.Runtime.Serialization.Json.dll
+ System.Runtime.Serialization.Primitives.dll
+ System.Runtime.Serialization.Xml.dll
+ System.Security.AccessControl.dll
+ System.Security.Claims.dll
+ System.Security.Cryptography.Algorithms.dll
+ System.Security.Cryptography.Cng.dll
+ System.Security.Cryptography.Csp.dll
+ System.Security.Cryptography.dll
+ System.Security.Cryptography.Encoding.dll
+ System.Security.Cryptography.OpenSsl.dll
+ System.Security.Cryptography.Primitives.dll
+ System.Security.Cryptography.X509Certificates.dll
+ System.Security.dll
+ System.Security.Principal.dll
+ System.Security.Principal.Windows.dll
+ System.Security.SecureString.dll
+ System.ServiceModel.Web.dll
+ System.ServiceProcess.dll
+ System.Text.Encoding.CodePages.dll
+ System.Text.Encoding.dll
+ System.Text.Encoding.Extensions.dll
+ System.Text.Encodings.Web.dll
+ System.Text.Json.dll
+ System.Text.RegularExpressions.dll
+ System.Threading.AccessControl.dll
+ System.Threading.Channels.dll
+ System.Threading.dll
+ System.Threading.Overlapped.dll
+ System.Threading.Tasks.Dataflow.dll
+ System.Threading.Tasks.dll
+ System.Threading.Tasks.Extensions.dll
+ System.Threading.Tasks.Parallel.dll
+ System.Threading.Thread.dll
+ System.Threading.ThreadPool.dll
+ System.Threading.Timer.dll
+ System.Transactions.dll
+ System.Transactions.Local.dll
+ System.ValueTuple.dll
+ System.Web.dll
+ System.Web.HttpUtility.dll
+ System.Windows.dll
+ System.Xml.dll
+ System.Xml.Linq.dll
+ System.Xml.ReaderWriter.dll
+ System.Xml.Serialization.dll
+ System.Xml.XDocument.dll
+ System.Xml.XmlDocument.dll
+ System.Xml.XmlSerializer.dll
+ System.Xml.XPath.dll
+ System.Xml.XPath.XDocument.dll
+ WindowsBase.dll
+<NUGET>/
+ blazor.storage/5.0.0/lib/net10.0/Blazor.Storage.dll
+ libphonenumber-csharp/9.0.22/lib/net9.0/PhoneNumbers.dll
+ microsoft.aspnetcore.authorization/10.0.5/lib/net10.0/Microsoft.AspNetCore.Authorization.dll
+ microsoft.aspnetcore.components.authorization/10.0.5/lib/net10.0/Microsoft.AspNetCore.Components.Authorization.dll
+ microsoft.aspnetcore.components.forms/10.0.5/lib/net10.0/Microsoft.AspNetCore.Components.Forms.dll
+ microsoft.aspnetcore.components.web/10.0.5/lib/net10.0/Microsoft.AspNetCore.Components.Web.dll
+ microsoft.aspnetcore.components.webassembly.authentication/10.0.5/lib/net10.0/Microsoft.AspNetCore.Components.WebAssembly.Authentication.dll
+ microsoft.aspnetcore.components.webassembly/10.0.5/lib/net10.0/Microsoft.AspNetCore.Components.WebAssembly.dll
+ microsoft.aspnetcore.components/10.0.5/lib/net10.0/Microsoft.AspNetCore.Components.dll
+ microsoft.aspnetcore.metadata/10.0.5/lib/net10.0/Microsoft.AspNetCore.Metadata.dll
+ microsoft.aspnetcore.webutilities/10.0.2/lib/net10.0/Microsoft.AspNetCore.WebUtilities.dll
+ microsoft.dotnet.hotreload.webassembly.browser/10.0.202/lib/net10.0/Microsoft.DotNet.HotReload.WebAssembly.Browser.dll
+ microsoft.extensions.configuration.abstractions/10.0.5/lib/net10.0/Microsoft.Extensions.Configuration.Abstractions.dll
+ microsoft.extensions.configuration.binder/10.0.5/lib/net10.0/Microsoft.Extensions.Configuration.Binder.dll
+ microsoft.extensions.configuration.fileextensions/10.0.5/lib/net10.0/Microsoft.Extensions.Configuration.FileExtensions.dll
+ microsoft.extensions.configuration.json/10.0.5/lib/net10.0/Microsoft.Extensions.Configuration.Json.dll
+ microsoft.extensions.configuration/10.0.5/lib/net10.0/Microsoft.Extensions.Configuration.dll
+ microsoft.extensions.dependencyinjection.abstractions/10.0.5/lib/net10.0/Microsoft.Extensions.DependencyInjection.Abstractions.dll
+ microsoft.extensions.dependencyinjection/10.0.5/lib/net10.0/Microsoft.Extensions.DependencyInjection.dll
+ microsoft.extensions.diagnostics.abstractions/10.0.5/lib/net10.0/Microsoft.Extensions.Diagnostics.Abstractions.dll
+ microsoft.extensions.diagnostics/10.0.5/lib/net10.0/Microsoft.Extensions.Diagnostics.dll
+ microsoft.extensions.fileproviders.abstractions/10.0.5/lib/net10.0/Microsoft.Extensions.FileProviders.Abstractions.dll
+ microsoft.extensions.fileproviders.physical/10.0.5/lib/net10.0/Microsoft.Extensions.FileProviders.Physical.dll
+ microsoft.extensions.filesystemglobbing/10.0.5/lib/net10.0/Microsoft.Extensions.FileSystemGlobbing.dll
+ microsoft.extensions.http.polly/10.0.2/lib/netstandard2.0/Microsoft.Extensions.Http.Polly.dll
+ microsoft.extensions.http/10.0.2/lib/net10.0/Microsoft.Extensions.Http.dll
+ microsoft.extensions.logging.abstractions/10.0.5/lib/net10.0/Microsoft.Extensions.Logging.Abstractions.dll
+ microsoft.extensions.logging/10.0.5/lib/net10.0/Microsoft.Extensions.Logging.dll
+ microsoft.extensions.options.configurationextensions/10.0.5/lib/net10.0/Microsoft.Extensions.Options.ConfigurationExtensions.dll
+ microsoft.extensions.options/10.0.5/lib/net10.0/Microsoft.Extensions.Options.dll
+ microsoft.extensions.primitives/10.0.5/lib/net10.0/Microsoft.Extensions.Primitives.dll
+ microsoft.extensions.validation/10.0.5/lib/net10.0/Microsoft.Extensions.Validation.dll
+ microsoft.identitymodel.abstractions/8.14.0/lib/net9.0/Microsoft.IdentityModel.Abstractions.dll
+ microsoft.identitymodel.jsonwebtokens/8.14.0/lib/net9.0/Microsoft.IdentityModel.JsonWebTokens.dll
+ microsoft.identitymodel.logging/8.14.0/lib/net9.0/Microsoft.IdentityModel.Logging.dll
+ microsoft.identitymodel.tokens/8.14.0/lib/net9.0/Microsoft.IdentityModel.Tokens.dll
+ microsoft.jsinterop.webassembly/10.0.5/lib/net10.0/Microsoft.JSInterop.WebAssembly.dll
+ microsoft.jsinterop/10.0.5/lib/net10.0/Microsoft.JSInterop.dll
+ microsoft.net.http.headers/10.0.2/lib/net10.0/Microsoft.Net.Http.Headers.dll
+ polly.extensions.http/3.0.0/lib/netstandard2.0/Polly.Extensions.Http.dll
+ polly/7.2.4/lib/netstandard2.0/Polly.dll
+ radzen.blazor/10.0.2/lib/net10.0/Radzen.Blazor.dll
+ system.identitymodel.tokens.jwt/8.14.0/lib/net9.0/System.IdentityModel.Tokens.Jwt.dll
+
+[analyzerReferences]
+<DOTNET>/packs/Microsoft.NETCore.App.Ref/10.0.8/analyzers/dotnet/cs/
+ Microsoft.Interop.ComInterfaceGenerator.dll
+ Microsoft.Interop.JavaScript.JSImportGenerator.dll
+ Microsoft.Interop.LibraryImportGenerator.dll
+ Microsoft.Interop.SourceGeneration.dll
+ System.Text.Json.SourceGeneration.dll
+ System.Text.RegularExpressions.Generator.dll
+<DOTNET>/sdk/10.0.202/Sdks/Microsoft.NET.Sdk.Razor/source-generators/
+ Microsoft.AspNetCore.Razor.Utilities.Shared.dll
+ Microsoft.CodeAnalysis.Razor.Compiler.dll
+ Microsoft.Extensions.ObjectPool.dll
+<DOTNET>/sdk/10.0.202/Sdks/Microsoft.NET.Sdk/analyzers/
+ Microsoft.CodeAnalysis.CSharp.NetAnalyzers.dll
+ Microsoft.CodeAnalysis.NetAnalyzers.dll
+<NUGET>/
+ microsoft.aspnetcore.components.analyzers/10.0.5/analyzers/dotnet/cs/Microsoft.AspNetCore.Components.Analyzers.dll
+ microsoft.extensions.logging.abstractions/10.0.5/analyzers/dotnet/roslyn4.4/cs/Microsoft.Extensions.Logging.Generators.dll
+ microsoft.extensions.options/10.0.5/analyzers/dotnet/roslyn4.4/cs/Microsoft.Extensions.Options.SourceGeneration.dll
+ microsoft.extensions.validation/10.0.5/analyzers/dotnet/cs/Microsoft.Extensions.Validation.ValidationsGenerator.dll
+ microsoft.net.illink.tasks/10.0.6/analyzers/dotnet/cs/
+  ILLink.CodeFixProvider.dll
+  ILLink.RoslynAnalyzer.dll
+
+[analyzerConfigFiles]
+<DOTNET>/sdk/10.0.202/Sdks/Microsoft.NET.Sdk/analyzers/build/config/analysislevel_10_default.globalconfig
+obj/Debug/net10.0/CloudAccounting.Wasm.GeneratedMSBuildEditorConfig.editorconfig
+
+[additionalFiles]
+App.razor
+Components/
+ CompanyFiscalYearIndicator.razor
+ CreateUserAndRole.razor
+ LoadingIndicator.razor
+ LogoutButton.razor
+ RedirectToLogin.razor
+ UpdateUserRole.razor
+Layout/
+ MainLayout.razor
+ NavMenu.razor
+Pages/Company/
+ CompaniesListPage.razor
+ CompanyCreatePage.razor
+ CompanyEditPage.razor
+Pages/CostCenters/
+ CostCentersEditPage.razor
+ CostCentersListPage.razor
+Pages/
+ FiscalYear/FiscalYearSetupPage.razor
+ Home.razor
+ Login.razor
+ NotFound.razor
+ Users/UsersListPage.razor
+ VoucherTypes/
+  VoucherTypesCreatePage.razor
+  VoucherTypesEditPage.razor
+  VoucherTypesListPage.razor
+_Imports.razor
+
+[dynamicFiles]
+App.razor
+Components/
+ CompanyFiscalYearIndicator.razor
+ CreateUserAndRole.razor
+ LoadingIndicator.razor
+ LogoutButton.razor
+ RedirectToLogin.razor
+ UpdateUserRole.razor
+Layout/
+ MainLayout.razor
+ NavMenu.razor
+Pages/Company/
+ CompaniesListPage.razor
+ CompanyCreatePage.razor
+ CompanyEditPage.razor
+Pages/CostCenters/
+ CostCentersEditPage.razor
+ CostCentersListPage.razor
+Pages/
+ FiscalYear/FiscalYearSetupPage.razor
+ Home.razor
+ Login.razor
+ NotFound.razor
+ Users/UsersListPage.razor
+ VoucherTypes/
+  VoucherTypesCreatePage.razor
+  VoucherTypesEditPage.razor
+  VoucherTypesListPage.razor
+_Imports.razor

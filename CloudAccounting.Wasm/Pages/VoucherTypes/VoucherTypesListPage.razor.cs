@@ -16,7 +16,7 @@ namespace CloudAccounting.Wasm.Pages.VoucherTypes
         private string _errorAlertTitle = string.Empty;
         private bool isLoading;
 
-        protected async override Task OnInitializedAsync()
+        protected override async Task OnInitializedAsync()
         {
             try
             {
