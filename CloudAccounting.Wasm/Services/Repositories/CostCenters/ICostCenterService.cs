@@ -8,7 +8,7 @@ public interface ICostCenterService
 
     Task<Result<CostCenterDto>> RetrieveByIdAsync(int companyCode, string costCenterCode);
 
-    Task<Result<CostCenterDto>> CreateAsync(CostCenterDto command);
+    Task<Result<CostCenterDto>> CreateAsync(CreateCostCenterCommand command);
 
     Task<Result> UpdateAsync(UpdateCostCenterCommand command);
 

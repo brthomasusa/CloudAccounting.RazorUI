@@ -94,7 +94,7 @@ public partial class CostCentersListPage
 
     private void GoToCreateCostCenterPage()
     {
-        Navigation!.NavigateTo($"/Pages/CostCenters/CostCentersCreatePage/{_selectedCompanyCode:int}");
+        Navigation!.NavigateTo($"/Pages/CostCenters/CostCentersCreatePage/{_selectedCompanyCode}");
     }
 
 

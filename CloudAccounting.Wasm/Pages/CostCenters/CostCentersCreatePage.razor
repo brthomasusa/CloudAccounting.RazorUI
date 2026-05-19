@@ -1,12 +1,12 @@
-@page "/Pages/CostCenters/CostCentersEditPage/{companyCode:int}/{costCenterCode}"
+@page "/Pages/CostCenters/CostCentersCreatePage/{companyCode:int}"
 @using CloudAccounting.Wasm.Components
 @using CloudAccounting.Wasm.Models.CostCenters
 
-<PageTitle>Edit Cost Center</PageTitle>
+<PageTitle>Create Cost Center</PageTitle>
 
 <RadzenStack Gap="1rem" Orientation="Orientation.Vertical" JustifyContent="JustifyContent.SpaceBetween"
              Style="height: 100%;">
-    <RadzenText TextStyle="TextStyle.Subtitle1">Edit Cost Centers</RadzenText>
+    <RadzenText TextStyle="TextStyle.Subtitle1">Create Cost Centers</RadzenText>
     <RadzenRow>
         <RadzenColumn Size="12" class="rz-p-4 rz-border-radius-1" Style="border: var(--rz-grid-cell-border)">
             @if (_costCenter is null)
@@ -15,38 +15,47 @@
             }
             else
             {
-                <NavigationLock OnBeforeInternalNavigation="OnBeforeInternalNavigation" ConfirmExternalNavigation="_hasUnsavedChanges" />
+                <NavigationLock OnBeforeInternalNavigation="OnBeforeInternalNavigation"
+                                ConfirmExternalNavigation="_hasUnsavedChanges" />
 
-                <RadzenTemplateForm TItem="CostCenterDto" Data="@_costCenter" Submit="@(async args => { await Submit(args); })">
+                <RadzenTemplateForm TItem="CreateCostCenterCommand" Data="@_costCenter"
+                                    Submit="@(async args => { await Submit(args); })">
                     <RadzenRow Gap="2rem" class="rz-p-0 rz-p-lg-4">
                         <RadzenColumn Size="12" SizeMD="8">
                             <RadzenStack Gap="1rem">
                                 <RadzenStack Orientation="Orientation.Vertical" Gap="0.5rem">
                                     <RadzenLabel Component="costCenterCodeInput">
-                                        Code <span style="color: var(--rz-danger);">*</span>                                    
+                                        Code <span style="color: var(--rz-danger);">*</span>
                                     </RadzenLabel>
-                                        
-                                    <RadzenTextBox Name="costCenterCodeInput"
-                                                   @bind-Value=@_costCenter.CostCenterCode ReadOnly="true" />                                                   
+
+                                    <RadzenTextBox Name="costCenterCodeInput" @bind-Value=@_costCenter.CostCenterCode
+                                                   Placeholder="Enter cost center code" @oninput="@(e => _hasUnsavedChanges = true)" />
+                                    <RadzenRequiredValidator Component="costCenterCodeInput" Text="Missing cost center code"
+                                                             Popup="true" Style="position: absolute" />
+                                    <RadzenLengthValidator Component="costCenterCodeInput" Max="5"
+                                                           Text="Cost center code should be at most 5 characters" Popup=true
+                                                           Style="position: absolute" />
                                 </RadzenStack>
 
                                 <RadzenStack Orientation="Orientation.Vertical" Gap="0.5rem">
                                     <RadzenLabel Component="costCenterTitleInput">
                                         Title <span style="color: var(--rz-danger);">*</span>
                                     </RadzenLabel>
-                                    <RadzenTextBox Name="costCenterTitleInput"
-                                                @bind-Value=@_costCenter.CostCenterTitle
-                                                Placeholder="Enter cost center title"
-                                                @oninput="@(e => _hasUnsavedChanges = true)" />
-                                    <RadzenRequiredValidator Component="costCenterTitleInput" Text="Missing cost center title" Popup="true" Style="position: absolute" />
-                                    <RadzenLengthValidator Component="costCenterTitleInput" Max="30" Text="Cost center title should be at most 30 characters" Popup=true Style="position: absolute" />
+                                    <RadzenTextBox Name="costCenterTitleInput" @bind-Value=@_costCenter.CostCenterTitle
+                                                   Placeholder="Enter cost center title"
+                                                   @oninput="@(e => _hasUnsavedChanges = true)" />
+                                    <RadzenRequiredValidator Component="costCenterTitleInput" Text="Missing cost center title"
+                                                             Popup="true" Style="position: absolute" />
+                                    <RadzenLengthValidator Component="costCenterTitleInput" Max="25"
+                                                           Text="Cost center title should be at most 25 characters" Popup=true
+                                                           Style="position: absolute" />
                                 </RadzenStack>
 
                                 <RadzenStack Orientation="Orientation.Vertical" Gap="0.5rem">
                                     <RadzenLabel Component="costCenterLevelInput">
                                         Level <span style="color: var(--rz-danger);">*</span>
                                     </RadzenLabel>
-                                    <RadzenNumeric Name="costCenterLevelInput" @bind-Value=@_costCenter.CostCenterLevel ReadOnly="true" />                                              
+                                    <RadzenNumeric Name="costCenterLevelInput" @bind-Value=@_costCenter.CostCenterLevel ReadOnly="true" />
                                 </RadzenStack>
                             </RadzenStack>
                         </RadzenColumn>
@@ -55,12 +64,10 @@
                         <RadzenColumn Size="6" class="rz-text-align-start">
                             <RadzenButton class="rz-mr-4" ButtonStyle="ButtonStyle.Light" Variant="Variant.Flat"
                                           Size="ButtonSize.Medium" Icon="cancel" Text="Cancel" Click="@Cancel" />
-                            <RadzenButton ButtonStyle="ButtonStyle.Danger" Variant="Variant.Flat" Size="ButtonSize.Medium"
-                                          Icon="delete" Text="Delete" Click="@Delete" />
                         </RadzenColumn>
                         <RadzenColumn Size="6" class="rz-text-align-end">
                             <RadzenButton ButtonType="ButtonType.Submit" ButtonStyle="ButtonStyle.Success"
-                                          Size="ButtonSize.Medium" Icon="save" Text="Apply Changes" />
+                                          Size="ButtonSize.Medium" Icon="save" Text="Save" />
                         </RadzenColumn>
                     </RadzenRow>
                 </RadzenTemplateForm>

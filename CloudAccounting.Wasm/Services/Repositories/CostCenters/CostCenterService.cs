@@ -109,7 +109,7 @@ public class CostCenterService
         }
     }
 
-    public async Task<Result<CostCenterDto>> CreateAsync(CostCenterDto command)
+    public async Task<Result<CostCenterDto>> CreateAsync(CreateCostCenterCommand command)
     {
         try
         {
