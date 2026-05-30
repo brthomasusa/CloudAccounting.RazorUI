@@ -13,7 +13,7 @@ public partial class CostCentersListPage
 
     private List<CostCenterDto>? _costCenters;
     private int _selectedCompanyCode;
-    private bool _showErrorAlert = false;
+    private bool _showErrorAlert;
     private string _errorAlertMessage = string.Empty;
     private string _errorAlertTitle = string.Empty;
     private bool isLoading;
