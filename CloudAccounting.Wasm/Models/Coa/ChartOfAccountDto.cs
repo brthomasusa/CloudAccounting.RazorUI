@@ -2,6 +2,8 @@ namespace CloudAccounting.Wasm.Models.Coa;
 
 public class ChartOfAccountDto
 {
+    public ChartOfAccountDto() { }
+
     public int CompanyCode { get; set; }
 
     public string AccountCode { get; set; } = null!;

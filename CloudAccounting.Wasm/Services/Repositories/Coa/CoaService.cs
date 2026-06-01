@@ -37,20 +37,18 @@ public class CoaService(IHttpClientFactory clientFactory, ILogger<CoaService> lo
         }
     }
 
-    public async Task<Result<PagedResponse<ChartOfAccountDto>>> RetrieveAllAsync(int pageNumber, int pageSize, int companyCode, string accountNumber)
+    public async Task<Result<PagedResponse<ChartOfAccountDto>>> RetrieveAllAsync(int pageNumber, int pageSize, int companyCode, string accountCode)
     {
         var queryParams = new Dictionary<string, string>
         {
             ["pageNumber"] = pageNumber.ToString(),
             ["pageSize"] = pageSize.ToString(),
             ["companyCode"] = companyCode.ToString(),
-            ["accountNumber"] = accountNumber
+            ["accountCode"] = accountCode
         };
 
-        var requestUri = QueryHelpers.AddQueryString(RelativePath, queryParams!);
+        var requestUri = QueryHelpers.AddQueryString($"{RelativePath}/filtered", queryParams!);
         var request = new HttpRequestMessage(HttpMethod.Get, requestUri);
-
-        logger.LogInformation("Sending request to {RequestUri}", requestUri);
 
         try
         {
@@ -59,9 +57,7 @@ public class CoaService(IHttpClientFactory clientFactory, ILogger<CoaService> lo
 
             if (response.IsSuccessStatusCode)
             {
-                logger.LogInformation("Request successful for {RequestUri}", requestUri);
-                var result = JsonSerializer.Deserialize<Result<PagedResponse<ChartOfAccountDto>>>(content);
-                return result!;
+                return await response.Content.ReadFromJsonAsync<PagedResponse<ChartOfAccountDto>>();
             }
             else
             {

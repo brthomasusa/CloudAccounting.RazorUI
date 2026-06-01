@@ -3,3 +3,76 @@
 @using CloudAccounting.Wasm.Models.Coa
 
 <PageTitle>Chart of Accounts</PageTitle>
+
+<RadzenStack Gap="1rem" Orientation="Orientation.Vertical" JustifyContent="JustifyContent.SpaceBetween"
+             Style="height: 100%;">
+    <RadzenRow>
+        <RadzenColumn Size="12" class="rz-p-4 rz-border-radius-1" Style="border: var(--rz-grid-cell-border)">
+            @if (_chartOfAccounts! is null || !_chartOfAccounts!.Data.Any())
+            {
+                <LoadingIndicator />
+            }
+            else
+            {
+                <ErrorBoundary>
+                    <ChildContent>
+                        <RadzenRow AlignItems="AlignItems.Center">
+                            <RadzenColumn Size="6">
+                                <RadzenText TextStyle="TextStyle.Subtitle1">Manage Chart of Accounts</RadzenText>
+                            </RadzenColumn>
+                            <RadzenColumn Size="6" class="rz-text-align-right">
+                                <RadzenButton Click="GoToCreateCoaPage" Icon="add_circle" Size="ButtonSize.Medium"
+                                              class="rz-border-radius-10 rz-shadow-6 rz-mb-4" ButtonStyle="ButtonStyle.Info"
+                                              title="Create a general ledger account" />
+                            </RadzenColumn>
+                        </RadzenRow>
+                        <RadzenDataGrid TItem="ChartOfAccountDto" Data="@(_chartOfAccounts!.Data)" IsLoading="@_isLoading"
+                                        LoadData="@GetChartOfAccounts" Count="@_totalRecords" AllowFiltering="true"
+                                        FilterMode="FilterMode.Simple" AllowPaging="true" AllowSorting="true"
+                                        FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive" Density="Density.Compact"
+                                        AllowAlternatingRows="true" PageSizeOptions="@pageSizeOptions"
+                                        PageSizeText="Rows per page" ShowPagingSummary="true"
+                                        PagerHorizontalAlign="HorizontalAlign.Center" GridLines="DataGridGridLines.Horizontal">
+                            <PagingSummaryTemplate>
+                                <RadzenIcon Icon="database" Style="color: var(--rz-info); font-size: var(--rz-pager-summary-font-size);" />
+                                Displaying page @_chartOfAccounts!.PageNumber of @_chartOfAccounts!.TotalPages: <b>(total @_chartOfAccounts!.TotalRecords records)</b>
+                            </PagingSummaryTemplate>
+                            <Columns>
+                                <RadzenDataGridColumn TItem="ChartOfAccountDto" Property="AccountCode" Title="Code"
+                                                      Filterable="true" Width="90px" />
+                                <RadzenDataGridColumn TItem="ChartOfAccountDto" Property="AccountTitle" Title="Title"
+                                                      Filterable="false" Width="160px" />
+                                <RadzenDataGridColumn TItem="ChartOfAccountDto" Property="AccountLevel" Title="Level"
+                                                      Filterable="false" Width="80px" />
+                                <RadzenDataGridColumn TItem="ChartOfAccountDto" Property="AccountClassification"
+                                                      Title="Classification" Filterable="false" Width="100px" />
+                                <RadzenDataGridColumn TItem="ChartOfAccountDto" Property="AccountType" Title="Type"
+                                                      Filterable="false" Width="80px" />
+                                <RadzenDataGridColumn TItem="ChartOfAccountDto" Property="CostCenterCode"
+                                                      Title="Cost Center" Filterable="false" Width="90px" />
+
+
+                                <RadzenDataGridColumn TItem="ChartOfAccountDto" Sortable="false" Filterable="false"
+                                                      Width="20px">
+                                    <Template Context="item">
+                                        <RadzenButton Click="() => ViewCoaDetails(item)" Icon="edit_square"
+                                                      Size="ButtonSize.ExtraSmall" class="rz-border-radius-10 rz-shadow-6"
+                                                      ButtonStyle="ButtonStyle.Info" />
+                                    </Template>
+                                </RadzenDataGridColumn>
+                            </Columns>
+                        </RadzenDataGrid>
+                    </ChildContent>
+                    <ErrorContent Context="ex">
+                        <!-- Fallback UI when an error occurs -->
+                        <p class="errorUI">An error has occurred: @ex.Message</p>
+                    </ErrorContent>
+                </ErrorBoundary>
+            }
+        </RadzenColumn>
+    </RadzenRow>
+    <RadzenAlert Visible="@_showErrorAlert" Title="@_errorAlertTitle" AlertStyle="AlertStyle.Danger"
+                 Variant="Variant.Flat" Shade="Shade.Lighter" AllowClose="true" Close="@OnAlertClose">
+        @_errorAlertMessage
+    </RadzenAlert>
+</RadzenStack>
