@@ -6,7 +6,7 @@ public class CreateChartOfAccountCommand
 
     public int CompanyCode { get; set; }
 
-    public required string LevelOne
+    public string? LevelOne
     {
         get;
         set

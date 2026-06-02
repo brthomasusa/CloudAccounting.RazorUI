@@ -13,7 +13,7 @@ public partial class CostCentersCreatePage
     [Inject] private NavigationManager? Navigation { get; set; }
     [Inject] private ILogger<CostCentersCreatePage>? Logger { get; set; }
 
-    private CreateCostCenterCommand _costCenter = new();
+    private CreateCostCenterCommand? _costCenter;
     private bool _showErrorAlert;
     private string _errorAlertMessage = string.Empty;
     private string _errorAlertTitle = string.Empty;
@@ -21,6 +21,7 @@ public partial class CostCentersCreatePage
 
     protected override async Task OnInitializedAsync()
     {
+        _costCenter = new();
         _costCenter.CompanyCode = CompanyCode;
         await base.OnInitializedAsync();
     }

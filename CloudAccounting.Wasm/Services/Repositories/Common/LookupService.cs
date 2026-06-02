@@ -64,5 +64,55 @@ namespace CloudAccounting.Wasm.Services.Repositories.Common
                 );
             }
         }
+
+        public async Task<Result<List<CostCenterLookupItem>>> GetCostCenterLookups(int companyCode)
+        {
+            try
+            {
+                HttpResponseMessage response = await _httpClient.GetAsync($"{relativePath}/costcenters/{companyCode}");
+
+                response.EnsureSuccessStatusCode();
+
+                List<CostCenterLookupItem>? lookups = await response.Content.ReadFromJsonAsync<List<CostCenterLookupItem>>();
+
+                return lookups;
+            }
+            catch (HttpRequestException e) when (e.StatusCode == System.Net.HttpStatusCode.NotFound)
+            {
+                string msg = $"Oops, unable to retrieve cost center lookups.";
+                _logger!.LogWarning("LookupService.GetCostCenterLookups: {message}", msg);
+
+                return Result.Failure<List<CostCenterLookupItem>>(
+                    new Error("LookupService.GetCostCenterLookups", msg)
+                );
+            }
+            catch (HttpRequestException e)
+            {
+                if (e.StatusCode.HasValue)
+                {
+                    _logger!.LogError("LookupService.GetCostCenterLookups: Status Code: {statusCode}", e.StatusCode.Value);
+                }
+                return Result.Failure<List<CostCenterLookupItem>>(
+                    new Error("LookupService.GetCostCenterLookups", Helpers.GetExceptionMessage(e))
+                );
+            }
+            catch (TaskCanceledException e)
+            {
+                _logger!.LogError("LookupService.GetCostCenterLookups: Request timed out or was canceled: {errMsg}", e.Message);
+
+                return Result.Failure<List<CostCenterLookupItem>>(
+                    new Error("LookupService.GetCostCenterLookups", Helpers.GetExceptionMessage(e))
+                );
+            }
+            catch (Exception ex)
+            {
+                string errMsg = Helpers.GetExceptionMessage(ex);
+                _logger!.LogError("LookupService.GetCostCenterLookups: {errMsg}", errMsg);
+
+                return Result.Failure<List<CostCenterLookupItem>>(
+                    new Error("LookupService.GetCostCenterLookups", errMsg)
+                );
+            }
+        }
     }
 }
