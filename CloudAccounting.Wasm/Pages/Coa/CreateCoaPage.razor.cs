@@ -56,6 +56,7 @@ public partial class CreateCoaPage
 
                 _coaCommand = new CreateChartOfAccountCommand();
                 _coaCommand.CompanyCode = arg.CompanyCode;
+                _hasUnsavedChanges = false;
             }
             else
             {
@@ -138,9 +139,9 @@ public partial class CreateCoaPage
 
     private List<GeneralLedgerAccountType> _generalLedgerAccountTypes = new()
             {
-        new() { Classification = "1", Name = "Asset" },
+        new() { Classification = "1", Name = "Equity" },
         new() { Classification = "2", Name = "Liability" },
-        new() { Classification = "3", Name = "Equity" },
+        new() { Classification = "3", Name = "Asset" },
         new() { Classification = "4", Name = "Revenue" },
         new() { Classification = "5", Name = "Expense" }
     };

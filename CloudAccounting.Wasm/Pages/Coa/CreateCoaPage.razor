@@ -25,23 +25,21 @@
                         <RadzenColumn Size="12" SizeMD="8">
                             <RadzenStack Gap="1rem">
 
-                                <RadzenStack Orientation="Orientation.Vertical" Gap="0.5rem">
-                                    <RadzenLabel Component="levelOneInput">
-                                        Level One <span style="color: var(--rz-danger);">*</span>
-                                    </RadzenLabel>                                    
-
-                                    <RadzenTextBox Name="levelOneInput" @bind-Value=@_coaCommand.LevelOne
-                                                   Placeholder="Enter 1st level of account code" @oninput="@(e => _hasUnsavedChanges = true)" />
-                                    <RadzenRequiredValidator Component="levelOneInput" Text="Missing 1st level of account code"
-                                                             Popup="true" Style="position: absolute" />
-                                    <RadzenLengthValidator Component="levelOneInput" Max="1"
-                                                           Text="1st level should be a single digit (1 - 5)" Popup=true
-                                                           Style="position: absolute" />
-                                    <RadzenCustomValidator Component="levelOneInput"
-                                                           Validator="@(() => IsValidLevelOne(_coaCommand.LevelOne!))"
-                                                           Text="1st level should be a single digit (1 - 5)"
-                                                           Popup="true"
-                                                           Style="position: absolute" />
+                                <RadzenStack Orientation="Orientation.Horizontal">
+                                    <RadzenLabel Style="width: 150px;" Component="classificationDropDown">
+                                        <span style="color: red;">*</span> Classification
+                                    </RadzenLabel>
+                                    @if (_generalLedgerAccountTypes is not null)
+                                    {
+                                        <RadzenDropDown @bind-Value=@_coaCommand.LevelOne
+                                                        Data=@_generalLedgerAccountTypes
+                                                        TValue="string"
+                                                        TextProperty="@nameof(GeneralLedgerAccountType.Name)"
+                                                        ValueProperty="@nameof(GeneralLedgerAccountType.Classification)"
+                                                        Style="width: 100%; max-width: 500px"
+                                                        Placeholder="Select..."
+                                                        Name="classificationDropDown" />
+                                    }
                                 </RadzenStack>
 
                                 <RadzenStack Orientation="Orientation.Vertical" Gap="0.5rem">
