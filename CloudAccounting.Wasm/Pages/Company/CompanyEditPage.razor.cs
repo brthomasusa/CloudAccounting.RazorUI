@@ -85,7 +85,7 @@ namespace CloudAccounting.Wasm.Pages.Company
                 string msg = "There are unsaved changes. Leave without saving?";
                 var dialogResponse = await DialogService!.Confirm(msg, "Leave without saving?", new ConfirmOptions() { OkButtonText = "Yes", CancelButtonText = "No" });
 
-                if ((bool)dialogResponse)
+                if ((bool)dialogResponse!)
                 {
                     Navigation?.NavigateTo("/Pages/Company/CompaniesListPage");
                 }
@@ -101,7 +101,7 @@ namespace CloudAccounting.Wasm.Pages.Company
             string msg = $"Do you wish to delete {_company!.CompanyName}? This can't be undone!";
             var dialogResponse = await DialogService!.Confirm(msg, $"Delete {_company!.CompanyName}?", new ConfirmOptions() { OkButtonText = "Yes", CancelButtonText = "No" });
 
-            if ((bool)dialogResponse)
+            if ((bool)dialogResponse!)
             {
                 Result result = await CompanyService!.DeleteCompanyAsync(_company!.CompanyCode);
 
@@ -139,7 +139,7 @@ namespace CloudAccounting.Wasm.Pages.Company
                 string msg = "There are unsaved changes. Leave without saving?";
                 var dialogResponse = await DialogService!.Confirm(msg, "Leave without saving?", new ConfirmOptions() { OkButtonText = "Yes", CancelButtonText = "No" });
 
-                if (!(bool)dialogResponse)
+                if (!(bool)dialogResponse!)
                 {
                     context.PreventNavigation();
                 }

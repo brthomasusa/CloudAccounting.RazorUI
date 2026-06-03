@@ -102,7 +102,7 @@ namespace CloudAccounting.Wasm.Pages.VoucherTypes
                 string msg = $"Do you wish to delete voucher type {_voucherTitle}? This can't be undone!";
                 var dialogResponse = await DialogService!.Confirm(msg, $"Delete {_voucherTitle}?", new ConfirmOptions() { OkButtonText = "Yes", CancelButtonText = "No" });
 
-                if ((bool)dialogResponse)
+                if ((bool)dialogResponse!)
                 {
                     Result result = await VoucherService!.DeleteAsync(_voucherType!.VoucherCode);
 
@@ -150,7 +150,7 @@ namespace CloudAccounting.Wasm.Pages.VoucherTypes
                 string msg = "There are unsaved changes. Leave without saving?";
                 var dialogResponse = await DialogService!.Confirm(msg, "Leave without saving?", new ConfirmOptions() { OkButtonText = "Yes", CancelButtonText = "No" });
 
-                if ((bool)dialogResponse)
+                if ((bool)dialogResponse!)
                 {
                     Navigation?.NavigateTo("/Pages/VoucherTypes/VoucherTypesListPage");
                 }
@@ -173,7 +173,7 @@ namespace CloudAccounting.Wasm.Pages.VoucherTypes
                 string msg = "There are unsaved changes. Leave without saving?";
                 var dialogResponse = await DialogService!.Confirm(msg, "Leave without saving?", new ConfirmOptions() { OkButtonText = "Yes", CancelButtonText = "No" });
 
-                if (!(bool)dialogResponse)
+                if (!(bool)dialogResponse!)
                 {
                     context.PreventNavigation();
                 }
