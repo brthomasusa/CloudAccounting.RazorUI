@@ -25,7 +25,7 @@
                         <RadzenColumn Size="12" SizeMD="8">
                             <RadzenStack Gap="1rem">
 
-                                <RadzenStack Orientation="Orientation.Horizontal">
+                                <RadzenStack Orientation="Orientation.Vertical">
                                     <RadzenLabel Style="width: 150px;" Component="classificationDropDown">
                                         <span style="color: red;">*</span> Classification
                                     </RadzenLabel>
@@ -96,7 +96,7 @@
 
                                 </RadzenStack>
 
-                                <RadzenStack Orientation="Orientation.Horizontal">
+                                <RadzenStack Orientation="Orientation.Vertical">
                                     <RadzenLabel Style="width: 150px;" Component="costCenterDropDown">
                                         <span style="color: red;">*</span> Cost Center
                                     </RadzenLabel>
@@ -111,8 +111,8 @@
                                         Placeholder="Select..."
                                         Name="costCenterDropDown" />
                                         <RadzenCustomValidator Component="costCenterDropDown"
-                                        Validator="@(() => ValidateCostCenter(_coaCommand.CostCenterCode))"
-                                        Text="Please select classification."
+                                        Validator="@(() => ValidateCostCenter(_coaCommand.CostCenterCode!))"
+                                        Text="Please select cost center."
                                         Popup="true" />
                                     }
                                 </RadzenStack>
@@ -134,4 +134,8 @@
             }
         </RadzenColumn>
     </RadzenRow>
+    <RadzenAlert Visible="@_showErrorAlert" Title="@_errorAlertTitle" AlertStyle="AlertStyle.Danger"
+                 Variant="Variant.Flat" Shade="Shade.Lighter" AllowClose="true" Close="@OnAlertClose">
+        @_errorAlertMessage
+    </RadzenAlert>  
 </RadzenStack>

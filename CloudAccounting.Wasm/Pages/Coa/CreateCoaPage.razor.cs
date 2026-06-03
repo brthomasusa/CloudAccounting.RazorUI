@@ -1,9 +1,4 @@
-
-using CloudAccounting.Wasm.Models.Coa;
-using CloudAccounting.Wasm.Models.CostCenters;
 using CloudAccounting.Wasm.Services.Repositories.Coa;
-using CloudAccounting.Wasm.Services.Repositories.Common;
-using CloudAccounting.Wasm.Models.Lookups;
 using Microsoft.AspNetCore.Components.Routing;
 
 namespace CloudAccounting.Wasm.Pages.Coa;
@@ -19,7 +14,7 @@ public partial class CreateCoaPage
     [Inject] private ILogger<CreateCoaPage>? Logger { get; set; }
 
     private CreateChartOfAccountCommand? _coaCommand;
-    private List<CostCenterLookupItem> _costCenterLookupItems;
+    private List<CostCenterLookupItem>? _costCenterLookupItems;
     private bool _showErrorAlert;
     private string _errorAlertMessage = string.Empty;
     private string _errorAlertTitle = string.Empty;
@@ -124,12 +119,6 @@ public partial class CreateCoaPage
         _showErrorAlert = false;
         _errorAlertMessage = string.Empty;
         _errorAlertTitle = string.Empty;
-    }
-
-    private static bool IsValidLevelOne(string level)
-    {
-        var validLevels = new[] { "1", "2", "3", "4", "5" };
-        return validLevels.Contains(level);
     }
 
     private static bool ValidateCostCenter(string costCenter)

@@ -10,7 +10,7 @@ public class ChartOfAccountDto
 
     public string? AccountTitle { get; set; }
 
-    public int? AccountLevel { get; set; }
+    public int AccountLevel { get; set; }
 
     public string? AccountClassification { get; set; }
 

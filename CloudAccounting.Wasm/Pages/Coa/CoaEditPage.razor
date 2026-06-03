@@ -1,5 +1,108 @@
-<h3>CoaEditPage</h3>
 
-@page "/Pages/Coa/CoaEditPage/{companyCode}"
+@page "/Pages/Coa/CoaEditPage/{companyCode:int}/{accountCode}"
 @using CloudAccounting.Wasm.Components
 @using CloudAccounting.Wasm.Models.Coa
+
+<PageTitle>Update General Ledger Account</PageTitle>
+
+<RadzenStack Gap="1rem" Orientation="Orientation.Vertical" JustifyContent="JustifyContent.SpaceBetween"
+             Style="height: 100%;">
+    <RadzenText TextStyle="TextStyle.Subtitle1">Update GL Account</RadzenText>
+    <RadzenRow>
+        <RadzenColumn Size="12" class="rz-p-4 rz-border-radius-1" Style="border: var(--rz-grid-cell-border)">
+            @if (_chartOfAccountDto is null)
+            {
+                <LoadingIndicator />
+            }
+            else
+            {
+                <NavigationLock OnBeforeInternalNavigation="OnBeforeInternalNavigation"
+                                ConfirmExternalNavigation="_hasUnsavedChanges" />
+
+                <RadzenTemplateForm TItem="ChartOfAccountDto" Data="@_chartOfAccountDto"
+                                    Submit="@(async args => { await Submit(args); })">
+                    <RadzenRow Gap="2rem" class="rz-p-0 rz-p-lg-4">
+                        <RadzenColumn Size="12" SizeMD="8">
+                            <RadzenStack Gap="1rem">
+
+                                <RadzenStack Orientation="Orientation.Vertical" Gap="0.5rem">
+                                    <RadzenLabel Component="accountCodeInput">
+                                        Code
+                                    </RadzenLabel>
+
+                                    <RadzenTextBox Name="accountCodeInput" @bind-Value=@_chartOfAccountDto.AccountCode ReadOnly="true" />
+                                </RadzenStack>
+
+                                <RadzenStack Orientation="Orientation.Vertical" Gap="0.5rem">
+                                    <RadzenLabel Component="acctTitleInput">
+                                        Title <span style="color: var(--rz-danger);">*</span>
+                                    </RadzenLabel>
+
+                                    <RadzenTextBox Name="acctTitleInput" @bind-Value=@_chartOfAccountDto.AccountTitle
+                                                   Placeholder="Enter account title" @oninput="@(e => _hasUnsavedChanges = true)" />
+                                    <RadzenRequiredValidator Component="acctTitleInput" Text="Missing account title"
+                                                             Popup="true" Style="position: absolute" />
+                                    <RadzenLengthValidator Component="acctTitleInput" Max="50"
+                                                           Text="Account title cannot exceed 50 characters" Popup=true
+                                                           Style="position: absolute" />
+                                </RadzenStack>
+
+                                <RadzenStack Orientation="Orientation.Vertical" Gap="0.5rem">
+                                    <RadzenLabel Component="accountClassificationInput">
+                                        Classification
+                                    </RadzenLabel>
+
+                                    <RadzenTextBox Name="accountClassificationInput" @bind-Value=@_chartOfAccountDto.AccountClassification ReadOnly="true" />
+                                </RadzenStack>
+
+                                <RadzenStack Orientation="Orientation.Vertical" Gap="0.5rem">
+                                    <RadzenLabel Component="acctTypeInput">
+                                        Type
+                                    </RadzenLabel>
+
+                                    <RadzenTextBox Name="acctTypeInput" @bind-Value=@_chartOfAccountDto.AccountType
+                                                   Placeholder="Enter account type" @oninput="@(e => _hasUnsavedChanges = true)" />
+
+                                </RadzenStack>
+
+                                <RadzenStack Orientation="Orientation.Vertical">
+                                    <RadzenLabel Style="width: 150px;" Component="costCenterDropDown">
+                                        <span style="color: red;">*</span> Cost Center
+                                    </RadzenLabel>
+                                    @if (_costCenterLookupItems is not null)
+                                    {
+                                        <RadzenDropDown @bind-Value=@_chartOfAccountDto.CostCenterCode
+                                                        Data=@_costCenterLookupItems
+                                                        TValue="string"
+                                                        TextProperty="@nameof(CostCenterLookupItem.CostCenterTitle)"
+                                                        ValueProperty="@nameof(CostCenterLookupItem.CostCenterCode)"
+                                                        Style="width: 100%; max-width: 500px"
+                                                        Placeholder="Select..."
+                                                        Name="costCenterDropDown" />
+                                    }
+                                </RadzenStack>
+
+                            </RadzenStack>
+                        </RadzenColumn>
+                    </RadzenRow>
+                    <RadzenRow AlignItems="AlignItems.Center">
+                        <RadzenColumn Size="6" class="rz-text-align-start">
+                            <RadzenButton class="rz-mr-4" ButtonStyle="ButtonStyle.Light" Variant="Variant.Flat"
+                                          Size="ButtonSize.Medium" Icon="cancel" Text="Cancel" Click="@Cancel" />
+                            <RadzenButton ButtonStyle="ButtonStyle.Danger" Variant="Variant.Flat" Size="ButtonSize.Medium"
+                                          Icon="delete" Text="Delete" Click="@Delete" />
+                        </RadzenColumn>
+                        <RadzenColumn Size="6" class="rz-text-align-end">
+                            <RadzenButton ButtonType="ButtonType.Submit" ButtonStyle="ButtonStyle.Success"
+                                          Size="ButtonSize.Medium" Icon="save" Text="Save" />
+                        </RadzenColumn>
+                    </RadzenRow>
+                </RadzenTemplateForm>
+            }
+        </RadzenColumn>
+    </RadzenRow>
+    <RadzenAlert Visible="@_showErrorAlert" Title="@_errorAlertTitle" AlertStyle="AlertStyle.Danger"
+                 Variant="Variant.Flat" Shade="Shade.Lighter" AllowClose="true" Close="@OnAlertClose">
+        @_errorAlertMessage
+    </RadzenAlert>
+</RadzenStack>

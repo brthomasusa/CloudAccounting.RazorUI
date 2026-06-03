@@ -61,7 +61,7 @@ namespace CloudAccounting.Wasm.Pages.Company
                 string msg = "There are unsaved changes. Leave without saving?";
                 var dialogResponse = await DialogService!.Confirm(msg, "Leave without saving?", new ConfirmOptions() { OkButtonText = "Yes", CancelButtonText = "No" });
 
-                if ((bool)dialogResponse)
+                if ((bool)dialogResponse!)
                 {
                     Navigation?.NavigateTo("/Pages/Company/CompaniesListPage");
                 }
