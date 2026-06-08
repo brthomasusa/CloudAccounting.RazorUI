@@ -65,7 +65,7 @@
 
 @code {
     private LoginCommand user = new LoginCommand();
-    private bool _showErrorAlert = false;
+    private bool _showErrorAlert;
     private string _errorAlertMessage = string.Empty;
     private string _errorAlertTitle = string.Empty;
     [Inject] private IAuthenticatedUserState? AuthenticatedUserState { get; set; }
@@ -83,6 +83,7 @@
             if (userResult.IsSuccess)
             {
                 AuthenticatedUserState!.SetUser(userResult.Value);
+
             }
 
             Navigation.NavigateTo("/");

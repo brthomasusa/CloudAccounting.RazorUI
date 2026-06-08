@@ -19,7 +19,7 @@ namespace CloudAccounting.Wasm.Services.ApplicationState
 
         public void SetUserId(string userId)
         {
-            _applicationUser!.UserId = userId;
+            _applicationUser.UserId = userId;
             NotifyStateChanged();
         }
 

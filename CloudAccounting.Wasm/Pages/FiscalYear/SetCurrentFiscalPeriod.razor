@@ -1,0 +1,80 @@
+@page "/Pages/FiscalYear/SetCurrentFiscalPeriod"
+@using CloudAccounting.Wasm.Components
+@using CloudAccounting.Wasm.Models.Authentication
+
+<PageTitle>Set Fiscal Period</PageTitle>
+
+<RadzenStack Gap="1rem" Orientation="Orientation.Vertical" JustifyContent="JustifyContent.SpaceBetween"
+             Style="height: 100%;">
+    <RadzenText TextStyle="TextStyle.Subtitle1">Set Current Fiscal Period</RadzenText>
+    <RadzenRow>
+        <RadzenColumn Size="12" class="rz-p-4 rz-border-radius-1" Style="border: var(--rz-grid-cell-border)">
+            @if (_updateUserFiscalPeriodCommand is null)
+            {
+                <LoadingIndicator />
+            }
+            else
+            {
+                <NavigationLock OnBeforeInternalNavigation="OnBeforeInternalNavigation"
+                                ConfirmExternalNavigation="_hasUnsavedChanges" />
+
+                <RadzenTemplateForm TItem="UpdateUserFiscalPeriodCommand" Data="@_updateUserFiscalPeriodCommand"
+                                    Submit="@(async args => { await Submit(args); })">
+                    <RadzenRow Gap="2rem" class="rz-p-0 rz-p-lg-4">
+                        <RadzenColumn Size="12" SizeMD="8">
+                            <RadzenStack Gap="1rem">
+
+                                <RadzenStack Orientation="Orientation.Vertical">
+                                    <RadzenLabel Style="width: 150px;" Component="fiscalYearDropDown">
+                                        <span style="color: red;">*</span> Fiscal Year
+                                    </RadzenLabel>
+                                    @if (_fiscalYears.Count > 0)
+                                    {
+                                        <RadzenDropDown @bind-Value=@_updateUserFiscalPeriodCommand.CompanyYear
+                                                        Change="@(async args => { _hasUnsavedChanges = true; await OnFiscalYearChanged(args); })"
+                                                        Data=@_fiscalYears TValue="short"
+                                                        TextProperty="@nameof(FiscalYearLookupItem.CompanyYear)"
+                                                        ValueProperty="@nameof(FiscalYearLookupItem.CompanyYear)"
+                                                        Style="width: 100%; max-width: 500px" Placeholder="Select..."
+                                                        Name="fiscalYearDropDown" />
+                                    }
+                                </RadzenStack>
+
+                                <RadzenStack Orientation="Orientation.Vertical">
+                                    <RadzenLabel Style="width: 150px;" Component="fiscalPeriodDropDown">
+                                        <span style="color: red;">*</span> Fiscal Period (Month)
+                                    </RadzenLabel>
+                                    @if (_fiscalPeriods.Count > 0)
+                                    {
+                                        <RadzenDropDown @bind-Value=@_updateUserFiscalPeriodCommand.CompanyMonthId
+                                                        Change="@(_ => { _hasUnsavedChanges = true; })"
+                                                        Data=@_fiscalPeriods TValue="byte"
+                                                        TextProperty="@nameof(FiscalPeriodLookupItem.CompanyMonthName)"
+                                                        ValueProperty="@nameof(FiscalPeriodLookupItem.CompanyMonthId)"
+                                                        Style="width: 100%; max-width: 500px" Placeholder="Select..."
+                                                        Name="fiscalPeriodDropDown" />
+                                    }
+                                </RadzenStack>
+
+                            </RadzenStack>
+                        </RadzenColumn>
+                    </RadzenRow>
+                    <RadzenRow AlignItems="AlignItems.Center">
+                        <RadzenColumn Size="6" class="rz-text-align-start">
+                            <RadzenButton class="rz-mr-4" ButtonStyle="ButtonStyle.Light" Variant="Variant.Flat"
+                                          Size="ButtonSize.Medium" Icon="cancel" Text="Cancel" Click="@Cancel" />
+                        </RadzenColumn>
+                        <RadzenColumn Size="6" class="rz-text-align-end">
+                            <RadzenButton ButtonType="ButtonType.Submit" ButtonStyle="ButtonStyle.Success"
+                                          Size="ButtonSize.Medium" Icon="save" Text="Set Current Fiscal Period" />
+                        </RadzenColumn>
+                    </RadzenRow>
+                </RadzenTemplateForm>
+            }
+        </RadzenColumn>
+    </RadzenRow>
+    <RadzenAlert Visible="@_showErrorAlert" Title="@_errorAlertTitle" AlertStyle="AlertStyle.Danger"
+                 Variant="Variant.Flat" Shade="Shade.Lighter" AllowClose="true" Close="@OnAlertClose">
+        @_errorAlertMessage
+    </RadzenAlert>
+</RadzenStack>

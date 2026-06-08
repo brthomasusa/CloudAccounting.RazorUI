@@ -3,7 +3,6 @@
 @implements IDisposable
 
 @using CloudAccounting.Wasm.Components
-@using CloudAccounting.Wasm.Pages
 @using CloudAccounting.Wasm.Authentication
 @using CloudAccounting.Wasm.Services.ApplicationState
 
@@ -18,9 +17,9 @@
             <RadzenStack Orientation="Orientation.Horizontal" Style="margin-left: auto;">
                 <AuthorizeView>
                     <Authorized>
-                        <CompanyFiscalYearIndicator CompanyName="@AuthenticatedUserState!.GetCompanyName()"
-                                                    CompanyMonthName="@AuthenticatedUserState!.GetCompanyMonthName()"
-                                                    CurrentFiscalYear="@AuthenticatedUserState!.GetCompanyYear()" />
+                        <CompanyFiscalYearIndicator CompanyName="@AuthenticatedUserState!.GetUser().CompanyName"
+                                                    CompanyMonthName="@AuthenticatedUserState!.GetUser().CompanyMonthName"
+                                                    CurrentFiscalYear="@AuthenticatedUserState!.GetUser().CompanyYear.ToString()" />
 
                         @if (@AuthenticatedUserState!.GetUser() != null)
                         {
@@ -44,8 +43,10 @@
                     <Authorized>
                         <RadzenPanelMenuItem Text="Company" Icon="corporate_fare"
                                              Path="/Pages/Company/CompaniesListPage" />
-                        <RadzenPanelMenuItem Text="Fiscal Year" Icon="date_range"
+                        <RadzenPanelMenuItem Text="Create Fiscal Year" Icon="date_range"
                                              Path="/Pages/FiscalYear/FiscalYearSetupPage" />
+                        <RadzenPanelMenuItem Text="Set Current Fiscal Period" Icon="date_range"
+                                             Path="/Pages/FiscalYear/SetCurrentFiscalPeriod" />
                         <RadzenPanelMenuItem Text="Voucher Types" Icon="local_activity"
                                              Path="/Pages/VoucherTypes/VoucherTypesListPage" />
                         <RadzenPanelMenuItem Text="Roles & Users" Icon="people" Path="/Pages/Users/UsersListPage" />

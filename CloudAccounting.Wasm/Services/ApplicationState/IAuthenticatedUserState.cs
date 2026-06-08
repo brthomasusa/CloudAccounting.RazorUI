@@ -4,7 +4,6 @@ namespace CloudAccounting.Wasm.Services.ApplicationState
 {
     public interface IAuthenticatedUserState
     {
-
         event Action OnChange;
         void SetUserId(string userId);
         void SetUser(ApplicationUser user);

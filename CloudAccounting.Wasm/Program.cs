@@ -7,6 +7,7 @@ using CloudAccounting.Wasm.Services.DelegatingHandlers;
 using CloudAccounting.Wasm.Services.Repositories.Authentication;
 using CloudAccounting.Wasm.Services.Repositories.Company;
 using CloudAccounting.Wasm.Services.Repositories.CostCenters;
+using CloudAccounting.Wasm.Services.Repositories.FiscalPeriod;
 using CloudAccounting.Wasm.Services.Repositories.VoucherTypes;
 using CloudAccounting.Wasm.Services.Repositories.Coa;
 using Microsoft.AspNetCore.Components.Authorization;
@@ -41,6 +42,7 @@ builder.Services.AddScoped<ICompanyService, CompanyService>()
                 .AddScoped<IAuthenticationService, AuthenticationService>()
                 .AddScoped<ICostCenterService, CostCenterService>()
                 .AddScoped<ICoaService, CoaService>()
+                .AddScoped<IFiscalPeriodService, FiscalPeriodService>()
                 .AddSingleton<IAuthenticatedUserState, AuthenticatedUserState>();
 
 builder.Services.AddRadzenComponents()
